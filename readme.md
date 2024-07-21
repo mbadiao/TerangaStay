@@ -1,7 +1,7 @@
-# TerangaStay
+# CaZa
 
 ## Description
-AppartHotel est une application de location d'appartements pour les étudiants et d'hôtels pour les touristes. L'application permet aux utilisateurs de trouver des logements adaptés à leurs besoins, qu'ils soient étudiants à la recherche d'un appartement abordable ou touristes en quête d'un hôtel confortable.
+CaZa est une application de location d'appartements pour les étudiants et d'hôtels pour les touristes. L'application permet aux utilisateurs de trouver des logements adaptés à leurs besoins, qu'ils soient étudiants à la recherche d'un appartement abordable ou touristes en quête d'un hôtel confortable.
 
 ## Objectifs Principaux
 - **Faciliter la recherche de logements** : Offrir une interface utilisateur simple et intuitive pour rechercher et réserver des appartements ou des hôtels.
