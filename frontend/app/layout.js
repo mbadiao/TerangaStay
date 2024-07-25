@@ -8,6 +8,8 @@ export const metadata = {
   description: "",
 };
 
+import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/toaster"
 import { Navbar } from "@/components/Navbar";
 import { NextAuthProvider } from "./Providers";
 
@@ -18,6 +20,8 @@ export default function RootLayout({ children }) {
         <NextAuthProvider>
           <Navbar />
           {children}
+          <Footer />
+          <Toaster />
         </NextAuthProvider>
       </body>
     </html>

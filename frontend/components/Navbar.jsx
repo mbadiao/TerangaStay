@@ -15,7 +15,6 @@ import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 
 export function Navbar() {
   const { status, data: session } = useSession();
-  console.log(session)
   return (
     <header className="sticky top-0 z-50 w-full bg-background shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
@@ -69,16 +68,6 @@ export function Navbar() {
                     <span>Profil</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link
-                    href="parametres"
-                    className="flex items-center gap-2"
-                    prefetch={false}
-                  >
-                    <SettingsIcon className="h-4 w-4" />
-                    <span>Paramètres</span>
-                  </Link>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link
@@ -118,11 +107,11 @@ export function Navbar() {
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary"
                 prefetch={false}
               >
-                <SearchIcon className="h-5 w-5" />
+                <CalendarIcon className="h-5 w-5" />
                 <span>Rechercher</span>
               </Link>
               <Link
-                href="reservation"
+                href="/reservation"
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary"
                 prefetch={false}
               >
@@ -148,16 +137,6 @@ export function Navbar() {
                     >
                       <UserIcon className="h-4 w-4" />
                       <span>Profil</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link
-                      href="parametres"
-                      className="flex items-center gap-2"
-                      prefetch={false}
-                    >
-                      <SettingsIcon className="h-4 w-4" />
-                      <span>Paramètres</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
