@@ -42,36 +42,39 @@ export default function Hote() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     propertyType: "",
-    country: null,
+    country: { value: "AF", label: "Afghanistan" },
     address: "",
     propertyCategory: "",
     monthlyPrice: "",
     nightlyPrice: "",
-    city: "",
-    zip: "",
+    city: "Dakar",
+    zip: "11000",
     amenities: {
-      kingSizeBed: false,
-      privateBathroom: false,
+      kingSizeBed: true,
+      privateBathroom: true,
       flatScreenTv: false,
       freeWifi: false,
       privateTerrace: false,
       airConditioning: false,
       safe: false,
     },
-    guests: "",
-    bedrooms: "",
-    beds: "",
-    bathrooms: "",
-    title: "",
-    description: "",
-    checkInTime: "",
-    checkOutTime: "",
-    houseRules: "",
-    cancellationPolicy: "",
+    guests: "3",
+    bedrooms: "3",
+    beds: "3",
+    bathrooms: "3",
+    title: "aaaaaaaaaaaaaaaaaaaaa",
+    description:
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    checkInTime: "15:23",
+    checkOutTime: "13:25",
+    houseRules:
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    cancellationPolicy:
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   });
   const [images, setImages] = useState([]);
   const countryOptions = useMemo(() => countryList().getData(), []);
-  const [address, setAddress] = useState()
+  const [address, setAddress] = useState();
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
@@ -104,20 +107,7 @@ export default function Hote() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const data = { ...formData, address ,images };
-    // Validate form data
-    if (!data.address || !data.propertyCategory || !data.propertyType) {
-      console.error("Les champs Adresse, Catégorie de propriété et Type de propriété sont obligatoires.");
-      return;
-    }
-    if (data.propertyCategory === "etudiants" && !data.monthlyPrice) {
-      console.error("Le prix par mois est requis pour les propriétés étudiantes.");
-      return;
-    }
-    if (data.propertyCategory === "touristes" && !data.nightlyPrice) {
-      console.error("Le prix par nuit est requis pour les propriétés touristiques.");
-      return;
-    }
+    const data = { ...formData, address, images };
     console.log("Form Data: ", data);
   };
 
@@ -153,8 +143,12 @@ export default function Hote() {
                   <SelectContent>
                     <SelectItem value="house">Maison</SelectItem>
                     <SelectItem value="apartment">Appartement</SelectItem>
-                    <SelectItem value="entire-home">Maison Entière</SelectItem>
-                    <SelectItem value="private-room">Chambre Privée</SelectItem>
+                    <SelectItem value="entire-home">
+                      Maison Entière
+                    </SelectItem>
+                    <SelectItem value="private-room">
+                      Chambre Privée
+                    </SelectItem>
                   </SelectContent>
                 </UiSelect>
               </div>
@@ -170,19 +164,27 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                  <Label htmlFor="address" className="flex items-center">
-                    <MdOutlineLocationOn className="mr-2 h-5 w-5" />
-                    Adresse
-                  </Label>
-                  <AddressAutocomplete address={formData.address} setAddress={(value) => setFormData({ ...formData, address: value })} />
-                </div>
+                <Label htmlFor="address" className="flex items-center">
+                  <MdOutlineLocationOn className="mr-2 h-5 w-5" />
+                  Adresse
+                </Label>
+                <AddressAutocomplete
+                  address={formData.address}
+                  setAddress={(value) =>
+                    setFormData({ ...formData, address: value })
+                  }
+                />
+              </div>
             </div>
           )}
 
           {step === 2 && (
             <>
               <div className="grid gap-2">
-                <Label htmlFor="propertyCategory" className="flex items-center">
+                <Label
+                  htmlFor="propertyCategory"
+                  className="flex items-center"
+                >
                   <AiOutlineHome className="mr-2 h-5 w-5" />
                   Catégorie de Propriété
                 </Label>
@@ -365,7 +367,10 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="description" className="flex items-center">
+                <Label
+                  htmlFor="description"
+                  className="flex items-center"
+                >
                   <AiOutlineFileText className="mr-2 h-5 w-5" />
                   Description de l'Annonce
                 </Label>
@@ -378,7 +383,10 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="checkInTime" className="flex items-center">
+                <Label
+                  htmlFor="checkInTime"
+                  className="flex items-center"
+                >
                   <MdOutlineMap className="mr-2 h-5 w-5" />
                   Heure d'Arrivée
                 </Label>
@@ -391,7 +399,10 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="checkOutTime" className="flex items-center">
+                <Label
+                  htmlFor="checkOutTime"
+                  className="flex items-center"
+                >
                   <MdOutlineMap className="mr-2 h-5 w-5" />
                   Heure de Départ
                 </Label>
@@ -404,7 +415,10 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="houseRules" className="flex items-center">
+                <Label
+                  htmlFor="houseRules"
+                  className="flex items-center"
+                >
                   <MdOutlineMap className="mr-2 h-5 w-5" />
                   Règlement Intérieur
                 </Label>
@@ -417,7 +431,10 @@ export default function Hote() {
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="cancellationPolicy" className="flex items-center">
+                <Label
+                  htmlFor="cancellationPolicy"
+                  className="flex items-center"
+                >
                   <MdOutlineMap className="mr-2 h-5 w-5" />
                   Politique d'Annulation
                 </Label>
@@ -446,23 +463,41 @@ export default function Hote() {
                   maxNumber={10}
                   dataURLKey="data_url"
                 >
-                  {({ imageList, onImageUpload, onImageRemoveAll, onImageUpdate, onImageRemove }) => (
+                  {({
+                    imageList,
+                    onImageUpload,
+                    onImageRemoveAll,
+                    onImageUpdate,
+                    onImageRemove,
+                  }) => (
                     <div className="upload__image-wrapper">
-                      <button onClick={onImageUpload} className="border p-2 rounded mb-2">
+                      <button
+                        onClick={onImageUpload}
+                        className="border p-2 rounded mb-2"
+                      >
                         Téléchargez des images
                       </button>
                       &nbsp;
-                      <button onClick={onImageRemoveAll} className="border p-2 rounded mb-2">
+                      <button
+                        onClick={onImageRemoveAll}
+                        className="border p-2 rounded mb-2"
+                      >
                         Supprimer toutes les images
                       </button>
                       {imageList.map((image, index) => (
                         <div key={index} className="image-item">
                           <img src={image.data_url} alt="" width="100" />
                           <div className="image-item__btn-wrapper">
-                            <button onClick={() => onImageUpdate(index)} className="border p-2 rounded mb-2">
+                            <button
+                              onClick={() => onImageUpdate(index)}
+                              className="border p-2 rounded mb-2"
+                            >
                               Mettre à jour
                             </button>
-                            <button onClick={() => onImageRemove(index)} className="border p-2 rounded mb-2">
+                            <button
+                              onClick={() => onImageRemove(index)}
+                              className="border p-2 rounded mb-2"
+                            >
                               Supprimer
                             </button>
                           </div>
