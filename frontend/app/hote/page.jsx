@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import countryList from "react-select-country-list";
 import Select from "react-select";
 import {
@@ -71,7 +71,7 @@ export default function Hote() {
   });
   const [images, setImages] = useState([]);
   const countryOptions = useMemo(() => countryList().getData(), []);
-
+  const [address, setAddress] = useState()
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
 
@@ -89,6 +89,7 @@ export default function Hote() {
     } else {
       setFormData({
         ...formData,
+        address,
         [name]: value,
       });
     }
@@ -103,18 +104,18 @@ export default function Hote() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const data = { ...formData, images };
+    const data = { ...formData, address ,images };
     // Validate form data
     if (!data.address || !data.propertyCategory || !data.propertyType) {
-      console.error("Missing required fields");
+      console.error("Les champs Adresse, Catégorie de propriété et Type de propriété sont obligatoires.");
       return;
     }
     if (data.propertyCategory === "etudiants" && !data.monthlyPrice) {
-      console.error("Monthly price is required for student properties");
+      console.error("Le prix par mois est requis pour les propriétés étudiantes.");
       return;
     }
     if (data.propertyCategory === "touristes" && !data.nightlyPrice) {
-      console.error("Nightly price is required for tourist properties");
+      console.error("Le prix par nuit est requis pour les propriétés touristiques.");
       return;
     }
     console.log("Form Data: ", data);
@@ -168,6 +169,13 @@ export default function Hote() {
                   onChange={(value) => handleSelectChange("country", value)}
                 />
               </div>
+              <div className="grid gap-2">
+                  <Label htmlFor="address" className="flex items-center">
+                    <MdOutlineLocationOn className="mr-2 h-5 w-5" />
+                    Adresse
+                  </Label>
+                  <AddressAutocomplete address={formData.address} setAddress={(value) => setFormData({ ...formData, address: value })} />
+                </div>
             </div>
           )}
 
@@ -272,15 +280,13 @@ export default function Hote() {
                       name={amenity}
                       checked={formData.amenities[amenity]}
                       onCheckedChange={(value) =>
-                        handleSelectChange(`amenities.${amenity}`, value)
+                        handleSelectChange("amenities", {
+                          ...formData.amenities,
+                          [amenity]: value,
+                        })
                       }
                     />
-                    <label
-                      htmlFor={amenity}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {amenity}
-                    </label>
+                    <Label htmlFor={amenity}>{amenity}</Label>
                   </div>
                 ))}
               </div>

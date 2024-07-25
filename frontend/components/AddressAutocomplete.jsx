@@ -3,8 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import tt from "@tomtom-international/web-sdk-services";
 import { Input } from "@/components/ui/input";
 
-
-const AddressAutocomplete = ({ value, onChange }) => {
+const AddressAutocomplete = ({ address, setAddress }) => {
   const inputRef = useRef();
   const [suggestions, setSuggestions] = useState([]);
 
@@ -38,7 +37,7 @@ const AddressAutocomplete = ({ value, onChange }) => {
   }, []);
 
   const handleSuggestionClick = (suggestion) => {
-    onChange(suggestion);
+    setAddress(suggestion);
     setSuggestions([]);
   };
 
@@ -47,8 +46,8 @@ const AddressAutocomplete = ({ value, onChange }) => {
       <Input
         type="text"
         ref={inputRef}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
         placeholder="Enter address"
         className="input"
       />
