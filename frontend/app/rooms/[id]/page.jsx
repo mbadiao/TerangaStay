@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -19,6 +20,7 @@ import { useParams } from "next/navigation";
 export default function Room() {
   const { id } = useParams();
   const [post, setPost] = useState({});
+
   useEffect(() => {
     fetch(process.env.NEXT_PUBLIC_BASE + `property/${id}`).then((response) => {
       response.json().then((Posts) => {
@@ -26,18 +28,25 @@ export default function Room() {
       });
     });
   }, []);
+
   console.log(post);
+
   const { title, uploadedImageIds, description } = post;
+
   const PRICE_PER_NIGHT = 150;
   const CLEANING_FEE = 50;
   const SERVICE_FEE = 70;
+
   const [date, setDate] = useState({
     from: new Date(2022, 0, 20),
     to: addDays(new Date(2022, 0, 20), 20),
   });
+
   const numberOfNights =
     date?.from && date?.to ? differenceInDays(date.to, date.from) + 1 : 0;
+
   const totalNightlyRate = numberOfNights * PRICE_PER_NIGHT;
+
   const totalBeforeTaxes = totalNightlyRate + CLEANING_FEE + SERVICE_FEE;
 
   const img =

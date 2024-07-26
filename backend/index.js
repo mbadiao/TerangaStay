@@ -8,7 +8,7 @@ const { config } = require("dotenv");
 const router = require("./routes/routes");
 config();
 const corsOptions = {
-  origin: process.env.HOST,
+  origin: '*',
   credentials: true,
 };
 

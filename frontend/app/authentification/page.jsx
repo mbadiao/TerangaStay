@@ -47,7 +47,6 @@ const Inscription = () => {
         title:"Login Error",
         description:`${e.message}`
       })
-      retrun
     }
   };
 
