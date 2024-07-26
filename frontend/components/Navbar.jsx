@@ -7,20 +7,39 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-
+import { signOut } from "next-auth/react";
 import { useSessionH } from "@/lib/useSession";
-
+import { getData } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
-
+import useUserStore from "@/store/userStore";
+import Cookies from "js-cookie";
 export function Navbar() {
+  const router = useRouter();
   const { status, data: session } = useSession();
+  const user = useUserStore((state) => state.profile);
+  console.log(session)
+  const setProfile = useUserStore.getState().setProfile;
+  const logout = () => {
+    Cookies.remove("token");
+    setProfile(null);
+    router.push("/");
+  };
 
-  const user = useSessionH();
+  const handleLogout = () => {
+    console.log("Before removal:", Cookies.get("next-auth.session-token"));
+    Cookies.remove("next-auth.session-token", { path: "/" }); // Ensure the path matches
 
-  console.log(user);
+    // Clear Zustand profile state
+    setProfile(null);
+
+    // Use next-auth's signOut method to handle session cleanup
+    signOut({ callbackUrl: "/" });
+
+    console.log("After removal:", Cookies.get("token"));
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full shadow-sm bg-background">
@@ -45,7 +64,7 @@ export function Navbar() {
             <CalendarIcon className="w-5 h-5" />
             <span>Mes réservations</span>
           </Link>
-          {user ? (
+          {user?.email || session ? (
             <Link
               href="/hote"
               className="px-4 py-2 text-sm font-medium transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
@@ -69,7 +88,7 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {user ? (
+                {user?.email || session ? (
                   <>
                     <DropdownMenuItem>
                       <Link
@@ -82,16 +101,27 @@ export function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Link
-                        href="/authentification/deconnexion"
-                        className="flex items-center gap-2"
-                        prefetch={false}
-                      >
-                        <LogInIcon className="w-4 h-4" />
-                        <span>Se déconnecter</span>
-                      </Link>
-                    </DropdownMenuItem>
+                    {session ? (
+                      <DropdownMenuItem>
+                        <Button
+                          onClick={handleLogout}
+                          className="flex items-center gap-2"
+                        >
+                          <LogInIcon className="w-4 h-4" />
+                          <span>Se déconnecter</span>
+                        </Button>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem>
+                        <Button
+                          onClick={logout}
+                          className="flex items-center gap-2"
+                        >
+                          <LogInIcon className="w-4 h-4" />
+                          <span>Se déconnecter</span>
+                        </Button>
+                      </DropdownMenuItem>
+                    )}
                   </>
                 ) : (
                   <>
@@ -157,7 +187,7 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  {user ? (
+                  {user?.email || session ? (
                     <>
                       <DropdownMenuItem>
                         <Link
@@ -171,14 +201,13 @@ export function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>
-                        <Link
-                          href="/authentification/deconnexion"
+                        <Button
+                          onClick={logout}
                           className="flex items-center gap-2"
-                          prefetch={false}
                         >
                           <LogInIcon className="w-4 h-4" />
                           <span>Se déconnecter</span>
-                        </Link>
+                        </Button>
                       </DropdownMenuItem>
                     </>
                   ) : (
@@ -207,7 +236,7 @@ export function Navbar() {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
-              {user ? (
+              {user?.email || session ? (
                 <Link
                   href="/hote"
                   className="px-4 py-2 text-sm font-medium transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"

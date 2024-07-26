@@ -23,19 +23,21 @@ const Connexion = () => {
     const result = await fetch(process.env.NEXT_PUBLIC_BASE + "connexion", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
-
+    const data = await result.json();
     if (result.ok) {
       toast({
         title: "Connexion réussie",
         description: "Vous êtes connecté avec succès.",
       });
+
       router.push("/");
     } else {
       toast({
         title: "Erreur de connexion",
-        description: result.message || "Une erreur est survenue.",
+        description: data.message,
       });
     }
   };

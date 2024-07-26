@@ -13,6 +13,6 @@ router.get("/property/:id", getPropertyById);
 router.post("/inscription", register);
 router.post("/property", postProperty);
 router.post("/connexion", login);
-// router.post("/logout", logout);
+router.post("/logout", logout);
 router.get("/profil", profile);
 module.exports = router;

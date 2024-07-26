@@ -6,16 +6,18 @@ const connectDataBase = require("./configuration/database");
 const app = express();
 const { config } = require("dotenv");
 const router = require("./routes/routes");
-config();
-const corsOptions = {
-  origin: '*',
-  credentials: true,
-};
 
-app.use(cors(corsOptions));
+config();
+
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.use(cookieParser());
+app.use(express.json());
 app.use(bodyParser.json());
 app.use("/api", router);
+
 app.listen(process.env.PORT, () => {
   console.log("app listen on 8080");
   connectDataBase();
