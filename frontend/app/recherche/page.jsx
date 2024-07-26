@@ -21,13 +21,8 @@ export default function Recherche() {
      <div className="flex flex-col min-h-screen">
         <header className="bg-white border-b shadow-sm sticky top-0 z-10">
          <div className="container  mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-          {/* <div className="flex items-center gap-6">
-             <Link href="#" className="text-2xl font-bold" prefetch={false}>
-               CaZa
-             </Link>
-           </div>
-           <div className="flex items-center  gap-4 w-full max-w-4xl">
-             <div className="bg-gray-100 rounded-full flex-1 flex items-center gap-4 px-4 py-2">
+            <div className="flex items-center  gap-4 w-full max-w-4xl">
+            <div className="bg-gray-100 rounded-full flex-1 flex items-center gap-4 px-4 py-2">
                <SearchIcon className="w-5 h-5 text-gray-500" />
                <Input
                  type="text"
@@ -60,11 +55,10 @@ export default function Recherche() {
              <Button size="lg" className="w-full h-12">
                Rechercher
              </Button>
-           </div>*/}
+           </div> 
          </div>
        </header>
-       {/* <main className="flex-1" /> */}
-       {/* <ThreeDCard/>  */}
+       <ThreeDCard/> 
     </div>
   );
 }

@@ -20,10 +20,10 @@ const Connexion = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
+    const result = await fetch(process.env.NEXT_PUBLIC_BASE + "connexion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
     });
 
     if (result.ok) {
@@ -35,7 +35,7 @@ const Connexion = () => {
     } else {
       toast({
         title: "Erreur de connexion",
-        description: result.error || "Une erreur est survenue.",
+        description: result.message || "Une erreur est survenue.",
       });
     }
   };

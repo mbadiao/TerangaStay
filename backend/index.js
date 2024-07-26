@@ -8,7 +8,7 @@ const { config } = require("dotenv");
 const router = require("./routes/routes");
 config();
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: process.env.HOST,
   credentials: true,
 };
 
@@ -16,7 +16,7 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/api", router);
-app.listen(8080, () => {
+app.listen(process.env.PORT, () => {
   console.log("app listen on 8080");
   connectDataBase();
 });

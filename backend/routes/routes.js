@@ -12,7 +12,7 @@ router.get("/properties", getAllProperties);
 router.get("/property/:id", getPropertyById);
 router.post("/inscription", register);
 router.post("/property", postProperty);
-// router.post("/login", login);
+router.post("/connexion", login);
 // router.post("/logout", logout);
 router.get("/profil", profile);
 module.exports = router;
