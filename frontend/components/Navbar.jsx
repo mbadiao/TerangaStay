@@ -31,7 +31,7 @@ export function Navbar() {
             <span>Rechercher</span>
           </Link>
           <Link
-            href="reservation"
+            href="/reservation"
             className="flex items-center gap-2 text-sm font-medium hover:text-primary"
             prefetch={false}
           >

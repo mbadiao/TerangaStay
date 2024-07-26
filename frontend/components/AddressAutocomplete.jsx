@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import tt from "@tomtom-international/web-sdk-services";
 import { Input } from "@/components/ui/input";
 
-const AddressAutocomplete = ({ address, setAddress }) => {
+const AddressAutocomplete = ({ value, onChange }) => {
   const inputRef = useRef();
   const [suggestions, setSuggestions] = useState([]);
 
@@ -14,18 +14,21 @@ const AddressAutocomplete = ({ address, setAddress }) => {
     }
 
     const handleInput = (e) => {
-      tt.services.fuzzySearch({
-        key: process.env.NEXT_PUBLIC_TOMTOM_API_KEY,
-        query: e.target.value,
-        language: 'fr',
-      })
-      .then((response) => {
-        const suggestions = response.results.map(result => result.address.freeformAddress);
-        setSuggestions(suggestions);
-      })
-      .catch((error) => {
-        console.error("Error fetching TomTom data:", error);
-      });
+      tt.services
+        .fuzzySearch({
+          key: process.env.NEXT_PUBLIC_TOMTOM_API_KEY,
+          query: e.target.value,
+          language: "fr",
+        })
+        .then((response) => {
+          const suggestions = response.results.map(
+            (result) => result.address.freeformAddress
+          );
+          setSuggestions(suggestions);
+        })
+        .catch((error) => {
+          console.error("Error fetching TomTom data:", error);
+        });
     };
 
     const inputElement = inputRef.current;
@@ -37,7 +40,7 @@ const AddressAutocomplete = ({ address, setAddress }) => {
   }, []);
 
   const handleSuggestionClick = (suggestion) => {
-    setAddress(suggestion);
+    onChange({ target: { name: "address", value: suggestion } });
     setSuggestions([]);
   };
 
@@ -46,8 +49,9 @@ const AddressAutocomplete = ({ address, setAddress }) => {
       <Input
         type="text"
         ref={inputRef}
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
+        value={value}
+        onChange={onChange}
+        name="address"
         placeholder="Enter address"
         className="input"
       />

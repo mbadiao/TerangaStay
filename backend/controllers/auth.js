@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const User = require("../Models/user");
+const User = require("../models/utilisateur");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -15,9 +15,9 @@ const login = asyncHandler(async (req, res) => {
       .status(200)
       .cookie("token", token, {
         httpOnly: true, // Accessible only by the web server
-        secure: process.env.NODE_ENV === 'production', // HTTPS in production
-        sameSite: 'None', // CSRF protection
-        maxAge: 3600000 // Cookie expiration time in milliseconds (1 hour)
+        secure: process.env.NODE_ENV === "production", // HTTPS in production
+        sameSite: "None", // CSRF protection
+        maxAge: 3600000, // Cookie expiration time in milliseconds (1 hour)
       })
       .json({ data: { user }, message: "Login successful" });
   }
@@ -25,31 +25,32 @@ const login = asyncHandler(async (req, res) => {
 });
 
 const register = asyncHandler(async (req, res) => {
-  const { firstname, lastname, username, password } = req.body;
+  const { name, lastname, email, phone, password } = req.body;
   try {
-    const existedUser = await User.findOne({ username });
+    const existedUser = await User.findOne({ email });
     if (existedUser)
       return res.status(400).json({ message: "User already exist" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      firstname,
+      name,
       lastname,
-      username,
+      email,
+      phone,
       password: hashedPassword,
     });
     const token = jwt.sign(
-      { userId: user._id, admin: user.isAdmin },
+      { id: user._id},
       process.env.SECRET
     );
     res
       .status(201)
       .cookie("token", token, {
         httpOnly: true, // Accessible only by the web server
-        secure: process.env.NODE_ENV === 'production', // HTTPS in production
-        sameSite: 'None', // CSRF protection
-        maxAge: 3600000 // Cookie expiration time in milliseconds (1 hour)
+        secure: process.env.NODE_ENV === "production", // HTTPS in production
+        sameSite: "None", // CSRF protection
+        maxAge: 3600000, // Cookie expiration time in milliseconds (1 hour)
       })
       .json({ data: { user }, message: "Register successful." });
   } catch (error) {
@@ -69,6 +70,5 @@ const profile = async (req, res) => {
     res.json(user);
   });
 };
-
 
 module.exports = { login, logout, register, profile };

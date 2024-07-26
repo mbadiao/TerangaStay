@@ -7,6 +7,11 @@ const nextConfig = {
         hostname: "img.freepik.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "cloud.appwrite.io",
+        pathname: "/**",
+      },
     ],
   },
 };

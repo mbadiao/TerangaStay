@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,20 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useParams } from "next/navigation";
 
 export default function Room() {
+  const { id } = useParams();
+  const [post, setPost] = useState({});
+  useEffect(() => {
+    fetch(process.env.NEXT_PUBLIC_BASE + `property/${id}`).then((response) => {
+      response.json().then((Posts) => {
+        setPost(Posts);
+      });
+    });
+  }, []);
+  console.log(post);
+  const { title, uploadedImageIds, description } = post;
   const PRICE_PER_NIGHT = 150;
   const CLEANING_FEE = 50;
   const SERVICE_FEE = 70;
@@ -42,7 +54,7 @@ export default function Room() {
               prefetch={false}
             >
               <img
-                src={img}
+                src={uploadedImageIds?.[0]}
                 alt="Chambre d'hôtel"
                 width={600}
                 height={400}
@@ -56,7 +68,7 @@ export default function Room() {
                 prefetch={false}
               >
                 <img
-                  src={img}
+                  src={uploadedImageIds?.[1]}
                   alt="Chambre d'hôtel"
                   width={300}
                   height={200}
@@ -69,7 +81,7 @@ export default function Room() {
                 prefetch={false}
               >
                 <img
-                  src={img}
+                  src={uploadedImageIds?.[2]}
                   alt="Chambre d'hôtel"
                   width={300}
                   height={200}
@@ -82,36 +94,26 @@ export default function Room() {
                 prefetch={false}
               >
                 <img
-                  src={img}
+                  src={uploadedImageIds?.[3]}
                   alt="Chambre d'hôtel"
                   width={300}
                   height={200}
                   className="object-cover w-full aspect-[3/2]"
                 />
               </Link>
-              <Link
-                href="#"
-                className="relative overflow-hidden rounded-lg"
-                prefetch={false}
-              >
                 <img
-                  src={img}
+                  src={uploadedImageIds?.[4]}
                   alt="Chambre d'hôtel"
                   width={300}
                   height={200}
                   className="object-cover w-full aspect-[3/2]"
                 />
-              </Link>
             </div>
           </div>
           <div className="prose max-w-none">
-            <h1 className="text-3xl font-bold">
-              Chambre cosy avec vue sur la mer
-            </h1>
+            <h1 className="text-3xl font-bold">{title}</h1>
             <p>
-              Découvrez notre chambre d'hôtel confortable et chaleureuse,
-              idéalement située avec une vue imprenable sur la mer. Profitez de
-              nos équipements haut de gamme pour un séjour inoubliable.
+            {description}
             </p>
             <ul>
               <li>

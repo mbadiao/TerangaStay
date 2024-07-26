@@ -83,6 +83,9 @@ dependencies:
   next-auth:
     specifier: ^4.24.7
     version: 4.24.7(next@14.2.5)(react-dom@18.3.1)(react@18.3.1)
+  node-appwrite:
+    specifier: ^13.0.0
+    version: 13.0.0
   places.js:
     specifier: ^1.19.0
     version: 1.19.0
@@ -5387,9 +5390,19 @@ packages:
       - babel-plugin-macros
     dev: false
 
+  /node-appwrite@13.0.0:
+    resolution: {integrity: sha512-O1g1RWcRYcvnVvR0Dykjoe/4UcL6ELVvZosb4B8/hhNvleuWfN2fOFxzeCaU8amGW6UtVtZqvNaUT3IF1mPBdA==}
+    dependencies:
+      node-fetch-native-with-agent: 1.7.2
+    dev: false
+
   /node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    dev: false
+
+  /node-fetch-native-with-agent@1.7.2:
+    resolution: {integrity: sha512-5MaOOCuJEvcckoz7/tjdx1M6OusOY6Xc5f459IaruGStWnKzlI1qpNgaAwmn4LmFYcsSlj+jBMk84wmmRxfk5g==}
     dev: false
 
   /node-fetch@3.2.10:
