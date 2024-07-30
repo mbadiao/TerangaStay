@@ -77,7 +77,7 @@ const Checkout = () => {
 
     fetchUserProfile();
     fetchReservations();
-  }, [setProfile]);
+  }, [setProfile,id]);
 
   const validateForm = () => {
     const newErrors = {};

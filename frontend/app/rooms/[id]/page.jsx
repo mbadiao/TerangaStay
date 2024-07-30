@@ -18,6 +18,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import useUserStore from "@/store/userStore";
+import Image from "next/image";
 export default function Room() {
   const { id } = useParams();
   const { toast } = useToast();
