@@ -200,7 +200,7 @@ export default function Room() {
                 }
               >
                 <ShowerHeadIcon className="w-4 h-4 mr-2" />
-                Salle de bain privative avec douche à l'italienne
+                Salle de bain privative avec douche à l&apos;italienne
               </li>
               <li
                 className={
@@ -408,7 +408,7 @@ export default function Room() {
           </div>
           <Button variant="outline" className="justify-self-start">
             <MailIcon className="w-4 h-4 mr-2" />
-            Contacter l'hôte
+            Contacter l&apos;hôte
           </Button>
         </div>
       </div>
