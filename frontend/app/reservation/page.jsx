@@ -1,12 +1,93 @@
+"use client";
 import { Button } from "@/components/ui/button";
-
+import { Select } from "@/components/ui/select";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 export default function Reservation() {
+  const [reservations, setReservations] = useState([]);
+  const [propertyTypeFilter, setPropertyTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchUserReservations = async () => {
+      const userid = localStorage.getItem("user");
+      try {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE + `reservation/user/${userid}`,
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setReservations(data);
+        } else {
+          toast({
+            description: "Erreur lors de la récupération des réservations",
+          });
+        }
+      } catch (error) {
+        toast({
+          description: `Error fetching user reservations: ${error}`,
+        });
+      }
+    };
+
+    fetchUserReservations();
+  }, []);
+
+  const filteredReservations = reservations.filter((reservation) => {
+    return (
+      (propertyTypeFilter === "all" ||
+        reservation.propriete.propertyType === propertyTypeFilter) &&
+      (statusFilter === "all" || reservation.statut === statusFilter)
+    );
+  });
+
   return (
     <div className="container mx-auto py-8 h-screen">
       <h1 className="text-3xl font-bold mb-6 flex items-center">
         <CalendarIcon className="mr-2 h-6 w-6" />
-        Hotel Reservations
+        Réservations d'Hôtel
       </h1>
+
+      <div className="mb-6 flex space-x-4">
+        <div>
+          <label htmlFor="propertyTypeFilter" className="block mb-2">
+            Filtrer par type de propriété
+          </label>
+          <select
+            id="propertyTypeFilter"
+            value={propertyTypeFilter}
+            onChange={(e) => setPropertyTypeFilter(e.target.value)}
+            className="border bg-primary text-white border-primary rounded-md p-2"
+          >
+            <option value="all">Tous</option>
+            <option value="appartement">Appartement</option>
+            <option value="hotel">Hôtel</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="statusFilter" className="block mb-2">
+            Filtrer par statut
+          </label>
+          <select
+            id="statusFilter"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border bg-primary text-white border-gray-300 rounded-md p-2"
+          >
+            <option value="all">Tous</option>
+            <option value="en attente">En attente</option>
+            <option value="confirmee">Confirmée</option>
+          </select>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full table-auto border-collapse">
           <thead>
@@ -15,21 +96,18 @@ export default function Reservation() {
                 <PackageIcon className="mr-2 h-4 w-4" />
                 Type
               </th>
-              <th className="px-4 py-2 text-left ">
+              <th className="px-4 py-2 text-left">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                Arrival
+                Arrivée
               </th>
               <th className="px-4 py-2 text-left">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                Departure
+                Départ
               </th>
-              <th className="px-4 py-2 text-left">
-                <DollarSignIcon className="mr-2 h-4 w-4" />
-                Total Price
-              </th>
+              <th className="px-4 py-2 text-left">XOF Prix Total</th>
               <th className="px-4 py-2 text-left">
                 <CircleCheckIcon className="mr-2 h-4 w-4" />
-                Status
+                Statut
               </th>
               <th className="px-4 py-2 text-left">
                 <FilePenIcon className="mr-2 h-4 w-4" />
@@ -38,121 +116,64 @@ export default function Reservation() {
             </tr>
           </thead>
           <tbody>
-            <tr className="border-b">
-              <td className="px-4 py-2">
-                <PackageIcon className="mr-2 h-4 w-4" />
-                Hotel
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-06-01
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-06-05
-              </td>
-              <td className="px-4 py-2">
-                <DollarSignIcon className="mr-2 h-4 w-4" />
-                $500
-              </td>
-              <td className="px-4 py-2">
-                <span className="bg-green-200 flex items-center justify-center text-green-800 px-2 py-1 rounded-full">
-                  <CircleCheckIcon className="mr-2 h-4 w-4" />
-                  Confirmed
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <FilePenIcon className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" color="red">
-                    <TrashIcon className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="px-4 py-2">
-                <PackageIcon className="mr-2 h-4 w-4" />
-                Room
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-07-15
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-07-20
-              </td>
-              <td className="px-4 py-2">
-                <DollarSignIcon className="mr-2 h-4 w-4" />
-                $300
-              </td>
-              <td className="px-4 py-2">
-                <span className="bg-yellow-200 flex items-center justify-center text-yellow-800 px-2 py-1 rounded-full">
-                  <CircleAlertIcon className="mr-2 h-4 w-4" />
-                  Pending
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <FilePenIcon className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" color="red">
-                    <TrashIcon className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </td>
-            </tr>
-            <tr className="border-b">
-              <td className="px-4 py-2">
-                <PackageIcon className="mr-2 h-4 w-4" />
-                Hotel
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-08-10
-              </td>
-              <td className="px-4 py-2">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                2023-08-15
-              </td>
-              <td className="px-4 py-2">
-                <DollarSignIcon className="mr-2 h-4 w-4" />
-                $600
-              </td>
-              <td className="px-4 py-2">
-                <span className="bg-red-200 flex items-center justify-center text-red-800 px-2 py-1 rounded-full">
-                  <CircleXIcon className="mr-2 h-4 w-4" />
-                  Cancelled
-                </span>
-              </td>
-              <td className="px-4 py-2">
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <FilePenIcon className="mr-2 h-4 w-4" />
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" color="red">
-                    <TrashIcon className="mr-2 h-4 w-4" />
-                    Delete
-                  </Button>
-                </div>
-              </td>
-            </tr>
+            {filteredReservations.map((reservation) => (
+              <tr className="border-b" key={reservation._id}>
+                <td className="px-4 py-2 flex items-center">
+                  <PackageIcon className="mr-2 h-4 w-4" />
+                  {reservation.propriete.propertyType}
+                </td>
+                <td className="px-4 py-2">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {new Date(reservation.dateDeDebut).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-2">
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {new Date(reservation.dateDeFin).toLocaleDateString()}
+                </td>
+                {reservation?.propriete.propertyType === "appartement" ? (
+                  <td className="px-4 py-2">
+                    {reservation?.montantMensuelTotal} XOF
+                  </td>
+                ) : (
+                  <td className="px-4 py-2">{reservation?.montantTotal} XOF</td>
+                )}
+                <td className="px-4 py-2">
+                  <span
+                    className={`flex items-center justify-center px-2 py-1 rounded-full ${
+                      reservation.statut === "confirmee"
+                        ? "bg-green-200 text-green-800"
+                        : reservation.statut === "en attente"
+                        ? "bg-yellow-200 text-yellow-800"
+                        : "bg-red-200 text-red-800"
+                    }`}
+                  >
+                    {reservation.statut === "confirmee" && (
+                      <CircleCheckIcon className="mr-2 h-4 w-4" />
+                    )}
+                    {reservation.statut === "en attente" && (
+                      <CircleAlertIcon className="mr-2 h-4 w-4" />
+                    )}
+                    {reservation.statut}
+                  </span>
+                </td>
+                <td className="px-4 py-2">
+                  <div className="flex gap-2">
+                    <Link href={`/checkout/${reservation._id}`}>
+                      <Button variant="outline" size="sm">
+                        <FilePenIcon className="mr-2 h-4 w-4" />
+                        Paiement
+                      </Button>
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
     </div>
   );
 }
-
 function CalendarIcon(props) {
   return (
     <svg
@@ -300,26 +321,7 @@ function PackageIcon(props) {
   );
 }
 
-function TrashIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-    </svg>
-  );
-}
+
 
 function XIcon(props) {
   return (
@@ -340,5 +342,3 @@ function XIcon(props) {
     </svg>
   );
 }
-
-

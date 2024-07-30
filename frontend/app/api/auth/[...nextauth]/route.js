@@ -34,7 +34,6 @@ const authOptions = {
           return false; // Empêche l'utilisateur de se connecter si l'inscription échoue
         }
         const data = await res.json();
-        console.log(data);
         return true; // Permet la connexion
       } catch (error) {
         console.log("Error while trying to register", error);
@@ -44,7 +43,7 @@ const authOptions = {
     async redirect({ url, baseUrl }) {
       // Redirige l'utilisateur vers "/recherche" après une connexion réussie
       if (url.startsWith(baseUrl)) {
-        return `${baseUrl}/recherche`;
+        return `${baseUrl}`;
       }
       return baseUrl;
     },

@@ -69,7 +69,6 @@ const Inscription = () => {
         <div className="flex flex-col items-center justify-center">
           <header className="mb-8 text-center">
             <div className="flex items-center justify-center mb-2">
-              <MountainIcon className="w-8 h-8 mr-2" />
               <h1 className="text-2xl font-bold">CaZa</h1>
             </div>
             <p className="text-muted-foreground">

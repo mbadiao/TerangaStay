@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -7,16 +9,114 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import useUserStore from "@/store/userStore";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
 
 export default function InfoPerso() {
+  const { toast } = useToast();
+  const user = useUserStore((state) => state.profile);
+  const setProfile = useUserStore((state) => state.setProfile);
+
+
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_BASE + "profil", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        }
+      } catch (error) {
+        toast({
+          title: "Erreur de récupération",
+          description: "Erreur lors de la récupération du profil utilisateur.",
+        });
+      }
+    };
+
+    fetchUserProfile();
+  }, [setProfile, toast]);
+
+  const [formData, setFormData] = useState({
+    id: user?._id,
+    name: user?.name || "",
+    lastname: user?.lastname || "",
+    phone: user?.phone || "",
+    badge: user?.badge || "",
+    bio: user?.bio || "",
+  });
+
+  useEffect(() => {
+    setFormData({
+      id: user?._id,
+      name: user?.name || "",
+      lastname: user?.lastname || "",
+      phone: user?.phone || "",
+      badge: user?.badge || "",
+      bio: user?.bio || "",
+    });
+  }, [user]);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [id]: value }));
+  };
+
+  const handlePhoneChange = (value) => {
+    setFormData((prevData) => ({ ...prevData, phone: value }));
+  };
+
+  const handleSubmit = async () => {
+    const updatedData = {};
+    for (const key in formData) {
+      if (formData[key].trim()) {
+        updatedData[key] = formData[key].trim();
+      }
+    }
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_BASE + "user/update",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      const data = await response.json();
+      toast({
+        title: "Mise à jour réussie",
+        description: "Votre profil a été mis à jour avec succès.",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur de mise à jour",
+        description: "Erreur lors de la mise à jour du profil.",
+      });
+    }
+  };
+
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto my-10">
       <CardHeader className="bg-muted/20 p-6">
         <div className="flex items-center justify-between gap-4">
           <div className="grid gap-1">
-            <h2 className="text-2xl font-bold">Mbaye Diao</h2>
+            <h2 className="text-2xl font-bold">
+              {user?.name} {user?.lastname}
+            </h2>
             <p className="text-muted-foreground">
-              Prénom d'usage: Information non fournie
+              Prénom d'usage: {user?.lastname}
             </p>
           </div>
           <Button
@@ -36,60 +136,55 @@ export default function InfoPerso() {
             <div className="grid gap-1">
               <Label htmlFor="name" className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
-                Nom officiel
+                Prénom
               </Label>
-              <Input id="name" defaultValue="Mbaye Diao" />
+              <Input id="name" value={formData.name} onChange={handleChange} />
             </div>
             <div className="grid gap-1">
-              <Label
-                htmlFor="preferred-name"
-                className="flex items-center gap-2"
-              >
+              <Label htmlFor="lastname" className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
-                Prénom d'usage
+                Nom
               </Label>
               <Input
-                id="preferred-name"
-                placeholder="Ajouter un prénom d'usage"
+                id="lastname"
+                value={formData.lastname}
+                onChange={handleChange}
               />
-            </div>
-            <div className="grid gap-1">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <MailIcon className="h-4 w-4" />
-                Adresse e-mail
-              </Label>
-              <Input id="email" type="email" defaultValue="d***2@gmail.com" />
             </div>
             <div className="grid gap-1">
               <Label htmlFor="phone" className="flex items-center gap-2">
                 <PhoneIcon className="h-4 w-4" />
                 Numéro de téléphone
               </Label>
-              <Input id="phone" placeholder="Ajouter un numéro de téléphone" />
-            </div>
-            <div className="grid gap-1">
-              <Label htmlFor="id" className="flex items-center gap-2">
-                <InfoIcon className="h-4 w-4" />
-                Pièce d'identité officielle
-              </Label>
-              <Input id="id" placeholder="Ajouter une pièce d'identité" />
-            </div>
-            <div className="grid gap-1">
-              <Label htmlFor="address" className="flex items-center gap-2">
-                <MapPinIcon className="h-4 w-4" />
-                Adresse
-              </Label>
-              <Input id="address" placeholder="Ajouter une adresse" />
-            </div>
-            <div className="grid gap-1">
-              <Label htmlFor="emergency" className="flex items-center gap-2">
-                <PhoneCallIcon className="h-4 w-4" />
-                Numéros d'urgence
-              </Label>
-              <Input
-                id="emergency"
-                placeholder="Ajouter des numéros d'urgence"
+              <PhoneInput
+                id="phone"
+                placeholder="Enter voter numéro de téléphone"
+                value={formData.phone}
+                onChange={handlePhoneChange}
               />
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="badge" className="flex items-center gap-2">
+                <InfoIcon className="h-4 w-4" />
+                Badge
+              </Label>
+              <select
+                id="badge"
+                value={formData.badge}
+                onChange={handleChange}
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Sélectionnez un badge</option>
+                <option value="hôte">Hôte</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div className="grid gap-1">
+              <Label htmlFor="bio" className="flex items-center gap-2">
+                <InfoIcon className="h-4 w-4" />
+                Bio
+              </Label>
+              <Input id="bio" value={formData.bio} onChange={handleChange} />
             </div>
           </div>
         </div>
@@ -102,11 +197,13 @@ export default function InfoPerso() {
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2 p-6">
+      <Link href='/profil'>
         <Button variant="outline" className="flex items-center gap-2">
           <XIcon className="h-4 w-4" />
           Annuler
         </Button>
-        <Button className="flex items-center gap-2">
+        </Link>
+        <Button className="flex items-center gap-2" onClick={handleSubmit}>
           <CheckIcon className="h-4 w-4" />
           Enregistrer les modifications
         </Button>

@@ -1,5 +1,5 @@
+"use client"
 import { create } from 'zustand'
-
 
 const useUserStore = create((set) => ({
   profile: null,

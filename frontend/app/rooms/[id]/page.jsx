@@ -15,27 +15,63 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useParams } from "next/navigation";
-
+import { useParams, useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
+import useUserStore from "@/store/userStore";
 export default function Room() {
   const { id } = useParams();
+  const { toast } = useToast();
   const [post, setPost] = useState({});
+  const [months, setMonths] = useState(1);
+  const increaseMonths = () => {
+    setMonths((prev) => prev + 1);
+  };
 
+  const decreaseMonths = () => {
+    setMonths((prev) => (prev > 1 ? prev - 1 : 1));
+  };
   useEffect(() => {
     fetch(process.env.NEXT_PUBLIC_BASE + `property/${id}`).then((response) => {
       response.json().then((Posts) => {
         setPost(Posts);
       });
     });
-  }, []);
+  }, [id]);
+  const users = useUserStore((state) => state.profile);
+  const setProfile = useUserStore((state) => state.setProfile);
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_BASE + "profil", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        }
+      } catch (error) {
+        console.log("Error fetching user profile:", error);
+      }
+    };
 
-  console.log(post);
-
-  const { title, uploadedImageIds, description } = post;
-
-  const PRICE_PER_NIGHT = 150;
-  const CLEANING_FEE = 50;
-  const SERVICE_FEE = 70;
+    fetchUserProfile();
+  }, [setProfile]);
+  const {
+    title,
+    uploadedImageIds,
+    description,
+    user,
+    amenities,
+    propertyCategory,
+    nightlyPrice,
+    monthlyPrice,
+  } = post;
+  const PRICE_PER_NIGHT =
+    propertyCategory === "touristes" ? nightlyPrice : null;
+  const PRICE_PER_MONTH =
+    propertyCategory === "etudiants" ? monthlyPrice : null;
+  const CLEANING_FEE = 20000;
+  const SERVICE_FEE = 10000;
 
   const [date, setDate] = useState({
     from: new Date(2022, 0, 20),
@@ -44,13 +80,65 @@ export default function Room() {
 
   const numberOfNights =
     date?.from && date?.to ? differenceInDays(date.to, date.from) + 1 : 0;
-
   const totalNightlyRate = numberOfNights * PRICE_PER_NIGHT;
-
   const totalBeforeTaxes = totalNightlyRate + CLEANING_FEE + SERVICE_FEE;
+  const tot = months * PRICE_PER_MONTH;
+  const totalMonthlyRate = tot + CLEANING_FEE + SERVICE_FEE;
+  const router = useRouter();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    let token = localStorage.getItem("user");
+    if (!token) {
+      toast({
+        title: "Erreur",
+        description: "veuillez vous connecter",
+      });
+      router.push("/authentification/connexion");
+      return;
+    }
 
-  const img =
-    "https://img.freepik.com/free-photo/city-water_1417-1903.jpg?w=740&t=st=1721500580~exp=1721501180~hmac=2f8551aefa1426fe477e663a8445311f1f3eb499aefb609749ae107bf781bb7f";
+    const bookingData = {
+      utilisateur: users._id,
+      propriete: id,
+      categorie: propertyCategory,
+      dateDeDebut: date.from,
+      dateDeFin: date.to,
+      nombreDeNuits: numberOfNights,
+      nombreDeMois: months,
+      montantTotal: totalBeforeTaxes,
+      montantMensuelTotal: totalMonthlyRate,
+      statut: "en attente",
+    };
+    try {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_BASE + "reservation",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bookingData),
+        }
+      );
+      const data = await response.json();
+      if (response.ok) {
+        toast({
+          title: "Réservation réussie",
+          description: "Votre réservation a été créée avec succès.",
+        });
+        router.push("/reservation");
+      } else {
+        toast({
+          title: "Erreur",
+          description: `${data.message}`,
+        });
+      }
+    } catch (e) {
+      toast({
+        title: "Erreur",
+        description: `${e.message}`,
+      });
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12">
@@ -71,85 +159,75 @@ export default function Room() {
               />
             </Link>
             <div className="grid grid-cols-2 gap-4">
-              <Link
-                href="#"
-                className="relative overflow-hidden rounded-lg"
-                prefetch={false}
-              >
-                <img
-                  src={uploadedImageIds?.[1]}
-                  alt="Chambre d'hôtel"
-                  width={300}
-                  height={200}
-                  className="object-cover w-full aspect-[3/2]"
-                />
-              </Link>
-              <Link
-                href="#"
-                className="relative overflow-hidden rounded-lg"
-                prefetch={false}
-              >
-                <img
-                  src={uploadedImageIds?.[2]}
-                  alt="Chambre d'hôtel"
-                  width={300}
-                  height={200}
-                  className="object-cover w-full aspect-[3/2]"
-                />
-              </Link>
-              <Link
-                href="#"
-                className="relative overflow-hidden rounded-lg"
-                prefetch={false}
-              >
-                <img
-                  src={uploadedImageIds?.[3]}
-                  alt="Chambre d'hôtel"
-                  width={300}
-                  height={200}
-                  className="object-cover w-full aspect-[3/2]"
-                />
-              </Link>
-                <img
-                  src={uploadedImageIds?.[4]}
-                  alt="Chambre d'hôtel"
-                  width={300}
-                  height={200}
-                  className="object-cover w-full aspect-[3/2]"
-                />
+              {uploadedImageIds?.slice(1, 5).map((image, index) => (
+                <Link
+                  key={index}
+                  href="#"
+                  className="relative overflow-hidden rounded-lg"
+                  prefetch={false}
+                >
+                  <img
+                    src={image}
+                    alt="Chambre d'hôtel"
+                    width={300}
+                    height={200}
+                    className="object-cover w-full aspect-[3/2]"
+                  />
+                </Link>
+              ))}
             </div>
           </div>
           <div className="prose max-w-none">
             <h1 className="text-3xl font-bold">{title}</h1>
-            <p>
-            {description}
-            </p>
-            <ul>
-              <li>
+            <p>{description}</p>
+            <ul className="mt-10">
+              <li
+                className={
+                  amenities?.kingSizeBed ? "flex" : "line-through flex"
+                }
+              >
                 <BedIcon className="w-4 h-4 mr-2" />
                 Lit king size
               </li>
-              <li>
+              <li
+                className={
+                  amenities?.privateBathroom ? "flex" : "line-through flex"
+                }
+              >
                 <ShowerHeadIcon className="w-4 h-4 mr-2" />
                 Salle de bain privative avec douche à l'italienne
               </li>
-              <li>
+              <li
+                className={
+                  amenities?.flatScreenTv ? "flex" : "line-through flex"
+                }
+              >
                 <TvIcon className="w-4 h-4 mr-2" />
                 Télévision à écran plat
               </li>
-              <li>
+              <li
+                className={amenities?.freeWifi ? "flex" : "line-through flex"}
+              >
                 <WifiIcon className="w-4 h-4 mr-2" />
                 Accès WiFi gratuit
               </li>
-              <li>
+              <li
+                className={
+                  amenities?.privateTerrace ? "flex" : "line-through flex"
+                }
+              >
                 <BuildingIcon className="w-4 h-4 mr-2" />
                 Terrasse privée avec vue sur la mer
               </li>
-              <li>
+              <li
+                className={
+                  amenities?.airConditioning ? "flex" : "line-through flex"
+                }
+              >
                 <AirVentIcon className="w-4 h-4 mr-2" />
                 Climatisation
               </li>
-              <li>
+              <li className={amenities?.safe ? "flex" : "line-through flex"}>
                 <SaveIcon className="w-4 h-4 mr-2" />
                 Coffre-fort
               </li>
@@ -159,93 +237,145 @@ export default function Room() {
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl font-bold">$150 / nuit</CardTitle>
+              <CardTitle className="text-2xl font-bold">
+                {propertyCategory === "touristes"
+                  ? `XOF ${nightlyPrice} / nuit`
+                  : `XOF ${monthlyPrice} / mois`}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="grid gap-4">
-                  <div className="flex gap-2">
-                    <DatePickerWithRange
-                      date={date}
-                      setDate={setDate}
-                      className="w-full"
-                    />
-                  </div>
-                  <Select>
-                    <SelectTrigger className="h-auto">
-                      <SelectValue
-                        placeholder={
-                          <div className="flex flex-col items-start">
-                            <span className="font-semibold uppercase text-[0.65rem]">
-                              Voyageurs
-                            </span>
-                            <span className="font-normal">2 adultes</span>
+                  {propertyCategory === "touristes" && (
+                    <>
+                      <div className="flex gap-2">
+                        <DatePickerWithRange
+                          date={date}
+                          setDate={setDate}
+                          className="w-full"
+                        />
+                      </div>
+                      <Select>
+                        <SelectTrigger className="h-auto">
+                          <SelectValue
+                            placeholder={
+                              <div className="flex flex-col items-start">
+                                <span className="font-semibold uppercase text-[0.65rem]">
+                                  Voyageurs
+                                </span>
+                                <span className="font-normal">2 adultes</span>
+                              </div>
+                            }
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 adulte</SelectItem>
+                          <SelectItem value="2">2 adultes</SelectItem>
+                          <SelectItem value="3">
+                            2 adultes + 1 enfant
+                          </SelectItem>
+                          <SelectItem value="other">Autre</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <div className="text-sm text-center text-muted-foreground">
+                        Vous ne serez pas facturé pour le moment
+                      </div>
+                    </>
+                  )}
+                  {propertyCategory === "etudiants" && (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <label htmlFor="months">Nombre de mois:</label>
+                        <div className="flex items-center">
+                          <Button
+                            type="button"
+                            onClick={decreaseMonths}
+                            className=""
+                          >
+                            -
+                          </Button>
+                          <div className="px-4 mx-4 py-1 border-primary bg-white border-t border-b">
+                            {months}
                           </div>
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 adulte</SelectItem>
-                      <SelectItem value="2">2 adultes</SelectItem>
-                      <SelectItem value="3">2 adultes + 1 enfant</SelectItem>
-                      <SelectItem value="other">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div>
-                    <Button size="lg" className="w-full h-12">
-                      Réserver
-                    </Button>
-                  </div>
-                  <div className="text-sm text-center text-muted-foreground">
-                    Vous ne serez pas facturé pour le moment
-                  </div>
+                          <Button
+                            type="button"
+                            onClick={increaseMonths}
+                            className=""
+                          >
+                            +
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid gap-4">
+                        <div className="flex items-center justify-between">
+                          <div className="text-muted-foreground">
+                            XOF / mois
+                          </div>
+                          <div>{monthlyPrice}</div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="text-muted-foreground">
+                            <BrushIcon className="w-4 h-4 mr-2" />
+                            Frais de ménage{" "}
+                            <span className="text-xs">(unique)</span>
+                          </div>
+                          <div>{CLEANING_FEE}</div>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="text-muted-foreground flex items-center">
+                            <PercentIcon className="w-4 h-4 mr-2" />
+                            Frais de service
+                          </div>
+                          <div>{SERVICE_FEE}</div>
+                        </div>
+                      </div>
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <div className="font-semibold">Total avant taxes</div>
+                        <div>{totalMonthlyRate} XOF</div>
+                      </div>
+                    </>
+                  )}
+                  <Button size="lg" className="w-full h-12" type="submit">
+                    Réserver
+                  </Button>
                 </div>
               </form>
             </CardContent>
           </Card>
-          <div className="grid gap-4">
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">
-                <DollarSignIcon className="w-4 h-4 mr-2" />
-                {PRICE_PER_NIGHT} x {numberOfNights} nuits
+          {propertyCategory === "touristes" && (
+            <div className="grid gap-4">
+              <div className="flex items-center justify-between">
+                <div className="text-muted-foreground">
+                  {PRICE_PER_NIGHT} x {numberOfNights} nuits
+                </div>
+                <div>{totalNightlyRate}</div>
               </div>
-              <div>
-                <DollarSignIcon className="w-4 h-4 mr-2" />
-                {totalNightlyRate}
+              <div className="flex items-center justify-between">
+                <div className="text-muted-foreground">
+                  <BrushIcon className="w-4 h-4 mr-2" />
+                  Frais de ménage <span className="text-xs">(unique)</span>
+                </div>
+                <div>{CLEANING_FEE}</div>
               </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">
-                <BrushIcon className="w-4 h-4 mr-2" />
-                Frais de ménage <span className="text-xs">(unique)</span>
-              </div>
-              <div>
-                <DollarSignIcon className="w-4 h-4 mr-2" />
-                {CLEANING_FEE}
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-muted-foreground">
-                <PercentIcon className="w-4 h-4 mr-2" />
-                Frais de service
-              </div>
-              <div>
-                <DollarSignIcon className="w-4 h-4 mr-2" />
-                {SERVICE_FEE}
+              <div className="flex items-center justify-between">
+                <div className="text-muted-foreground flex items-center">
+                  <PercentIcon className="w-4 h-4 mr-2" />
+                  Frais de service
+                </div>
+                <div>{SERVICE_FEE}</div>
               </div>
             </div>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <div className="font-semibold">
-              <DollarSignIcon className="w-4 h-4 mr-2" />
-              Total avant taxes
-            </div>
-            <div>
-              <DollarSignIcon className="w-4 h-4 mr-2" />
-              {totalBeforeTaxes}
-            </div>
-          </div>
+          )}
+          {propertyCategory === "touristes" && (
+            <>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <div className="font-semibold">Total avant taxes</div>
+                <div>{totalBeforeTaxes} XOF</div>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
@@ -256,24 +386,20 @@ export default function Room() {
           <div className="flex items-center gap-4">
             <Avatar className="border w-11 h-11">
               <AvatarImage src="/placeholder-user.jpg" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarFallback>
+                {user?.name?.charAt(0) + user?.lastname?.charAt(0)}
+              </AvatarFallback>
             </Avatar>
             <div className="grid">
-              <div className="font-semibold">Catherine</div>
+              <div className="font-semibold">{user?.name}</div>
               <div className="text-sm text-muted-foreground">
                 <StarIcon className="w-4 h-4 mr-2" />
-                Superhost depuis 2015
+                {user?.badge}
               </div>
             </div>
           </div>
           <div className="text-sm leading-loose text-muted-foreground">
-            <p>
-              Bonjour, je suis Catherine, votre hôte pour ce séjour. J'ai hâte
-              de vous accueillir dans notre chambre d'hôtel et de vous faire
-              découvrir notre magnifique région. N'hésitez pas à me contacter si
-              vous avez la moindre question, je serai ravi de vous aider à
-              préparer votre séjour.
-            </p>
+            <p>{user?.bio}</p>
           </div>
           <Button variant="outline" className="justify-self-start">
             <MailIcon className="w-4 h-4 mr-2" />

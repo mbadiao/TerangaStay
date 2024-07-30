@@ -7,24 +7,11 @@ const userSchema = new Schema({
   lastname: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  // phone: { type: String, required: true },
-  profilEtudiant: {
-    universite: String,
-    programmeDetudes: String,
-  },
-  profilTouriste: {
-    informationsSupplementaires: String,
-  },
-  reservations: [{ type: Schema.Types.ObjectId, ref: "Reservation" }],
-
+  phone: { type: String, default: "" },
+  badge: { type: String, default: "" },
+  bio: { type: String, default: "" },
 });
 
 const User = mongoose.model("User", userSchema);
-
-// role: {
-//   type: String,
-//   enum: ["etudiant", "touriste", "administrateur"],
-//   required: true,
-// },
 
 module.exports = User;

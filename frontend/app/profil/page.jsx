@@ -1,95 +1,140 @@
+"use client";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-
+import useUserStore from "@/store/userStore";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 export default function Profil() {
+  const [checkouts, setcheckout] = useState([]);
+  const router = useRouter();
+  const user = useUserStore((state) => state.profile);
+  const setProfile = useUserStore((state) => state.setProfile);
+
+  const logout = async () => {
+    try {
+      localStorage.removeItem("user");
+
+      const response = await fetch(process.env.NEXT_PUBLIC_BASE + "logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+      }
+    } catch (error) {
+      console.log("Error fetching user profile:", error);
+    }
+    setProfile(null);
+    router.push("/");
+  };
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_BASE + "profil", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        }
+      } catch (error) {
+        console.log("Error fetching user profile:", error);
+      }
+    };
+
+    const fetchUserCheckout = async () => {
+      try {
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_BASE +
+            "checkouts/" +
+            localStorage.getItem("user"),
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setcheckout(data);
+        }
+      } catch (error) {
+        console.log("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+    fetchUserCheckout();
+  }, [setProfile, setcheckout]);
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto min-h-screen mt-10">
       <header className="bg-primary text-primary-foreground p-6 rounded-t-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12">
+            <Avatar className="border w-11 h-11">
               <AvatarImage src="/placeholder-user.jpg" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback className="text-primary">
+                {user?.name?.charAt(0) + user?.lastname?.charAt(0)}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-lg font-semibold">John Doe</h2>
+              <h2 className="text-lg font-semibold">
+                {user?.name} {user?.lastname}
+              </h2>
               <div className="text-sm text-primary-foreground/80">
-                john@example.com
+                {user?.email}
               </div>
               <div className="text-sm text-primary-foreground/80">
-                +1 (555) 123-4567
+                {user?.phone}
               </div>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-primary-foreground"
-          >
-            <SettingsIcon className="h-6 w-6" />
-            <span className="sr-only">Settings</span>
-          </Button>
         </div>
       </header>
       <section className="bg-background p-6 border-b border-muted">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Mes réservations</h3>
-          <Link
-            href="#"
-            className="text-primary hover:underline"
-            prefetch={false}
-          >
-            Voir tout
-          </Link>
+          <h3 className="text-lg font-semibold">Mes Payments</h3>
         </div>
         <div className="grid gap-4 mt-4">
-          <Card>
-            <CardContent className="grid grid-cols-[1fr_auto] gap-4">
-              <div>
-                <h4 className="font-medium">Hôtel Ritz-Carlton</h4>
-                <div className="text-sm text-muted-foreground">
-                  Du 15 juin au 20 juin 2023
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Chambre Deluxe
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="text-lg font-semibold">$1,200</div>
-                <Button variant="outline" size="sm">
-                  Annuler
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="grid grid-cols-[1fr_auto] gap-4">
-              <div>
-                <h4 className="font-medium">Hôtel Fairmont</h4>
-                <div className="text-sm text-muted-foreground">
-                  Du 1er août au 5 août 2023
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  Chambre Supérieure
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <div className="text-lg font-semibold">$800</div>
-                <Button variant="outline" size="sm">
-                  Annuler
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {checkouts.length > 0 ? (
+            checkouts.map((checkout) => (
+              <Card className="py-4">
+                <CardContent className="grid grid-cols-[1fr_auto] gap-4">
+                  <div>
+                    <h4 className="font-medium">
+                      {checkout?.reservationDetails.type}
+                    </h4>
+                    <div className="text-sm text-muted-foreground">
+                      {checkout?.address}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {checkout?.createdAt}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="text-lg font-semibold">
+                      XOF{" "}
+                      {checkout?.reservationDetails.montantTotal ||
+                        checkout?.reservationDetails.montantMensuelTotal}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="text-center">
+              Vous n&apos;avez pas encore de reservation
+            </div>
+          )}
         </div>
       </section>
       <section className="bg-background p-6 border-b border-muted">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Mes préférences</h3>
           <Link
-            href="#"
+            href="profil/info"
             className="text-primary hover:underline"
             prefetch={false}
           >
@@ -129,7 +174,7 @@ export default function Profil() {
         </div>
       </section>
       <div className="bg-background p-6 rounded-b-lg">
-        <Button variant="destructive" className="w-full">
+        <Button variant="destructive" onClick={logout} className="w-full">
           Se déconnecter
         </Button>
       </div>

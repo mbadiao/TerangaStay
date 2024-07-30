@@ -7,10 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { signOut } from "next-auth/react";
-import { useSessionH } from "@/lib/useSession";
-import { getData } from "@/lib/utils";
-import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
@@ -18,27 +15,42 @@ import useUserStore from "@/store/userStore";
 import Cookies from "js-cookie";
 export function Navbar() {
   const router = useRouter();
-  const { status, data: session } = useSession();
   const user = useUserStore((state) => state.profile);
-  console.log(session)
-  const setProfile = useUserStore.getState().setProfile;
-  const logout = () => {
-    Cookies.remove("token");
+  const setProfile = useUserStore((state) => state.setProfile);
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch(process.env.NEXT_PUBLIC_BASE + "profil", {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setProfile(data);
+        }
+      } catch (error) {
+        console.log("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [setProfile]);
+
+  const logout = async () => {
+    try {
+      localStorage.removeItem("user");
+
+      const response = await fetch(process.env.NEXT_PUBLIC_BASE + "logout", {
+        method:'POST',
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+      }
+    } catch (error) {
+      console.log("Error fetching user profile:", error);
+    }
     setProfile(null);
-    router.push("/");
-  };
-
-  const handleLogout = () => {
-    console.log("Before removal:", Cookies.get("next-auth.session-token"));
-    Cookies.remove("next-auth.session-token", { path: "/" }); // Ensure the path matches
-
-    // Clear Zustand profile state
-    setProfile(null);
-
-    // Use next-auth's signOut method to handle session cleanup
-    signOut({ callbackUrl: "/" });
-
-    console.log("After removal:", Cookies.get("token"));
+    router.push('/');
   };
 
   return (
@@ -49,14 +61,6 @@ export function Navbar() {
         </Link>
         <nav className="items-center hidden gap-6 md:flex">
           <Link
-            href="/recherche"
-            className="flex items-center gap-2 text-sm font-medium hover:text-primary"
-            prefetch={false}
-          >
-            <SearchIcon className="w-5 h-5" />
-            <span>Rechercher</span>
-          </Link>
-          <Link
             href="/reservation"
             className="flex items-center gap-2 text-sm font-medium hover:text-primary"
             prefetch={false}
@@ -64,7 +68,7 @@ export function Navbar() {
             <CalendarIcon className="w-5 h-5" />
             <span>Mes réservations</span>
           </Link>
-          {user?.email || session ? (
+          {user?.email && (
             <Link
               href="/hote"
               className="px-4 py-2 text-sm font-medium transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
@@ -72,8 +76,6 @@ export function Navbar() {
             >
               Devenir hôte
             </Link>
-          ) : (
-            <></>
           )}
           <div className="flex items-center gap-4 ml-auto">
             <DropdownMenu>
@@ -88,7 +90,7 @@ export function Navbar() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                {user?.email || session ? (
+                {user?.email ? (
                   <>
                     <DropdownMenuItem>
                       <Link
@@ -101,27 +103,15 @@ export function Navbar() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {session ? (
-                      <DropdownMenuItem>
-                        <Button
-                          onClick={handleLogout}
-                          className="flex items-center gap-2"
-                        >
-                          <LogInIcon className="w-4 h-4" />
-                          <span>Se déconnecter</span>
-                        </Button>
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem>
-                        <Button
-                          onClick={logout}
-                          className="flex items-center gap-2"
-                        >
-                          <LogInIcon className="w-4 h-4" />
-                          <span>Se déconnecter</span>
-                        </Button>
-                      </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem>
+                      <Button
+                        onClick={logout}
+                        className="flex items-center gap-2"
+                      >
+                        <LogInIcon className="w-4 h-4" />
+                        <span>Se déconnecter</span>
+                      </Button>
+                    </DropdownMenuItem>
                   </>
                 ) : (
                   <>
@@ -161,14 +151,6 @@ export function Navbar() {
           <SheetContent side="left" className="md:hidden">
             <div className="grid gap-6 p-4">
               <Link
-                href="/recherche"
-                className="flex items-center gap-2 text-sm font-medium hover:text-primary"
-                prefetch={false}
-              >
-                <CalendarIcon className="w-5 h-5" />
-                <span>Rechercher</span>
-              </Link>
-              <Link
                 href="/reservation"
                 className="flex items-center gap-2 text-sm font-medium hover:text-primary"
                 prefetch={false}
@@ -187,7 +169,7 @@ export function Navbar() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
-                  {user?.email || session ? (
+                  {user?.email ? (
                     <>
                       <DropdownMenuItem>
                         <Link
@@ -206,7 +188,7 @@ export function Navbar() {
                           className="flex items-center gap-2"
                         >
                           <LogInIcon className="w-4 h-4" />
-                          <span>Se déconnecter</span>
+                          <span>Se déconnecters</span>
                         </Button>
                       </DropdownMenuItem>
                     </>
@@ -236,7 +218,7 @@ export function Navbar() {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
-              {user?.email || session ? (
+              {user?.email ? (
                 <Link
                   href="/hote"
                   className="px-4 py-2 text-sm font-medium transition-colors rounded-md shadow-sm bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"

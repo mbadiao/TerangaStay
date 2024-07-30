@@ -10,40 +10,46 @@ export async function POST(req) {
   await connectDataBase();
 
   // Récupérez les données de la requête
-  const { email } = await req.json();
+  const { name, lastname, email, password } = await req.json();
 
   // Trouvez l'utilisateur par email
-  const user = await User.findOne({ email });
-  if (user) {
-    // Créez un jeton JWT
-    const token = jwt.sign(
-      { userId: user._id, admin: user.isAdmin },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+  let user = await User.findOne({ email });
 
-    // Sérialisez le cookie
-    const serializedCookie = cookie.serialize("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "lax",
-      maxAge: 3600, // 1 heure
-      path: "/",
+  if (!user) {
+    // Si l'utilisateur n'existe pas, créez-le
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user = new User({
+      name,
+      lastname,
+      email,
+      password: hashedPassword,
     });
 
-    // Créez la réponse et définissez le cookie
-    const response = NextResponse.json(
-      { data: { user }, message: "Login successful" },
-      { status: 200 }
-    );
-    response.headers.set("Set-Cookie", serializedCookie);
-
-    return response;
+    await user.save();
   }
 
-  // Si les informations de connexion sont incorrectes
-  return NextResponse.json(
-    { message: "Invalid email or password" },
-    { status: 401 }
+  // Créez un jeton JWT
+  const token = jwt.sign(
+    { id: user._id},
+    process.env.JWT_SECRET,
   );
+  
+
+  // Sérialisez le cookie
+  const serializedCookie = cookie.serialize("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 3600000,
+  });
+
+  // Créez la réponse et définissez le cookie
+  const response = NextResponse.json(
+    { data: { user }, message: "Login successful" },
+    { status: 200 }
+  );
+  response.headers.set("Set-Cookie", serializedCookie);
+
+  return response;
 }

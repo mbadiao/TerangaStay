@@ -24,7 +24,7 @@ const getAllProperties = asyncHandler(async (req, res) => {
 const getPropertyById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   try {
-    const property = await Property.findById(id);
+    const property = await Property.findById(id).populate('user');
     if (!property) {
       res.status(404).json({ message: "Property not found" });
       return;

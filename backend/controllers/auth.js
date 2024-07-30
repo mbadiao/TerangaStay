@@ -8,7 +8,7 @@ const login = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
   if (user && (await bcrypt.compare(password, user.password))) {
     const token = jwt.sign(
-      { userId: user._id, admin: user.isAdmin },
+      { id: user._id, admin: user.isAdmin },
       process.env.JWT_SECRET
     );
     return res
@@ -62,13 +62,37 @@ const logout = asyncHandler(async (req, res) => {
   res.status(200).cookie("token", "").json({ message: "Logout successful" });
 });
 
+const updateUser = asyncHandler(async (req, res) => {
+  const { id, name, lastname, phone, badge, bio } = req.body;
+
+  try {
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.name = name || user.name;
+    user.lastname = lastname || user.lastname;
+    user.phone = phone || user.phone;
+    user.badge = badge || user.badge;
+    user.bio = bio || user.bio;
+
+    await user.save();
+
+    res.status(200).json({ data: user, message: "User updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
+  }
+});
+
 const profile = async (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, process.env.JWT_SECRET, {}, async (err, info) => {
     if (err) return res.json(err);
-    const user = await User.findById(info.userId);
+    const user = await User.findById(info.id);
     res.json(user);
   });
 };
 
-module.exports = { login, logout, register, profile };
+module.exports = { login, logout, register, profile, updateUser };
