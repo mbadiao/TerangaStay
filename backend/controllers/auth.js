@@ -40,10 +40,7 @@ const register = asyncHandler(async (req, res) => {
       phone,
       password: hashedPassword,
     });
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     res
       .status(201)
       .cookie("token", token, {
@@ -59,7 +56,13 @@ const register = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-  res.status(200).cookie("token", "").json({ message: "Logout successful" });
+  res
+    .status(200)
+    .cookie("token", "", {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    })
+    .json({ message: "Logout successful" });
 });
 
 const updateUser = asyncHandler(async (req, res) => {
