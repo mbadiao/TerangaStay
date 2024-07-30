@@ -16,7 +16,7 @@ const login = asyncHandler(async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: "lax",
         maxAge: 3600000,
       })
       .json({ data: { user }, message: "Login successful" });
@@ -49,7 +49,7 @@ const register = asyncHandler(async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
+        sameSite: "lax",
         maxAge: 3600000,
       })
       .json({ data: { user }, message: "Register successful." });

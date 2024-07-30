@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import AddressAutocomplete from "@/components/AddressAutocomplete";
+// import AddressAutocomplete from "@/components/AddressAutocomplete";
 import Image from "next/image";
 import {
   AiOutlineHome,
@@ -42,6 +42,8 @@ import ImageUploading from "react-images-uploading";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import useUserStore from "@/store/userStore";
+import dynamic from "next/dynamic";
+const AddressAutocomplete = dynamic(() => import('@/components/AddressAutocomplete'), { ssr: false });
 export default function Hote() {
   const router = useRouter();
   const [step, setStep] = useState(1);
