@@ -116,7 +116,7 @@ export default function InfoPerso() {
               {user?.name} {user?.lastname}
             </h2>
             <p className="text-muted-foreground">
-              Prénom d'usage: {user?.lastname}
+              Prénom d&apos;usage: {user?.lastname}
             </p>
           </div>
           <Button

@@ -37,7 +37,7 @@ export default function Reservation() {
     };
 
     fetchUserReservations();
-  }, []);
+  }, [toast]);
 
   const filteredReservations = reservations.filter((reservation) => {
     return (
@@ -51,7 +51,7 @@ export default function Reservation() {
     <div className="container mx-auto py-8 h-screen">
       <h1 className="text-3xl font-bold mb-6 flex items-center">
         <CalendarIcon className="mr-2 h-6 w-6" />
-        Réservations d'Hôtel
+        Réservations d&apos;Hôtel
       </h1>
 
       <div className="mb-6 flex space-x-4">

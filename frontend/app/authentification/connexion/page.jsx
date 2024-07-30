@@ -96,7 +96,7 @@ const Connexion = () => {
                 </div>
               </form>
               <div className="flex gap-3 mt-4 flex-wrap">
-                <p>vous n'avez pas de compte ?</p>
+                <p>vous n&apos;avez pas de compte ?</p>
                 <Link
                   href="/authentification"
                   className="text-primary"

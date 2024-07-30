@@ -14,7 +14,7 @@ export function Hero() {
             avec CaZa
           </h1>
           <p className="max-w-[600px] text-secondary-foreground md:text-xl">
-            Découvrez notre sélection de chambres étudiantes et d'hôtels pour un
+            Découvrez notre sélection de chambres étudiantes et d&apos;hôtels pour un
             séjour parfait.
           </p>
         </div>

@@ -77,7 +77,7 @@ const Inscription = () => {
           </header>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-1 md:gap-12">
             <div className="bg-card p-6 rounded-lg shadow-lg">
-              <h2 className="text-xl font-bold mb-4 text-center">S'inscrire</h2>
+              <h2 className="text-xl font-bold mb-4 text-center">S&apos;inscrire</h2>
               <form className="space-y-4" onSubmit={handleregister}>
                 <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                   <div>
@@ -128,7 +128,7 @@ const Inscription = () => {
                   </div>
                 </div>
                 <Button type="submit" className="w-full">
-                  S'inscrire
+                  S&apos;inscrire
                 </Button>
               </form>
               <div className="flex gap-3 mt-4 flex-wrap">

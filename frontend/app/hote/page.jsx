@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import Image from "next/image";
 import {
   AiOutlineHome,
   AiOutlineUser,
@@ -189,7 +190,7 @@ export default function Hote() {
       {loading && (
         <div className="z-10 bg-black opacity-50 absolute w-full min-h-screen">
           <div className="text-xl text-white grid place-items-center   min-h-screen">
-            <img src="/Animation.gif" alt="Animation" className="mr-2  w-40" />
+            <Image src="/Animation.gif" alt="Animation" className="mr-2  w-40" />
           </div>
         </div>
       )}
@@ -429,7 +430,7 @@ export default function Hote() {
                 <div className="grid gap-2">
                   <Label htmlFor="title" className="flex items-center">
                     <AiOutlineFileText className="mr-2 h-5 w-5" />
-                    Titre de l'Annonce
+                    Titre de l&apos;Annonce
                   </Label>
                   <Input
                     id="title"
@@ -442,7 +443,7 @@ export default function Hote() {
                 <div className="grid gap-2">
                   <Label htmlFor="description" className="flex items-center">
                     <AiOutlineFileText className="mr-2 h-5 w-5" />
-                    Description de l'Annonce
+                    Description de l&apos;Annonce
                   </Label>
                   <Textarea
                     id="description"
@@ -471,7 +472,7 @@ export default function Hote() {
                     className="flex items-center"
                   >
                     <MdOutlineMap className="mr-2 h-5 w-5" />
-                    Politique d'Annulation
+                    Politique d&apos;Annulation
                   </Label>
                   <Textarea
                     id="cancellationPolicy"
@@ -526,7 +527,7 @@ export default function Hote() {
                       </button>
                       {imageList.map((image, index) => (
                         <div key={index} className="image-item flex">
-                          <img src={image.data_url} alt="" width="100" />
+                          <Image src={image.data_url} alt="" width="100" />
                           <div className="image-item__btn-wrapper ">
                             <Button
                               onClick={(e) => {

@@ -132,7 +132,7 @@ export function Navbar() {
                         prefetch={false}
                       >
                         <LogInIcon className="w-4 h-4" />
-                        <span>S'inscrire</span>
+                        <span>S&apos;inscrire</span>
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -211,7 +211,7 @@ export function Navbar() {
                           prefetch={false}
                         >
                           <LogInIcon className="w-4 h-4" />
-                          <span>S'inscrire</span>
+                          <span>S&apos;inscrire</span>
                         </Link>
                       </DropdownMenuItem>
                     </>

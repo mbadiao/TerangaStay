@@ -30,6 +30,7 @@ export default function Room() {
   const decreaseMonths = () => {
     setMonths((prev) => (prev > 1 ? prev - 1 : 1));
   };
+
   useEffect(() => {
     fetch(process.env.NEXT_PUBLIC_BASE + `property/${id}`).then((response) => {
       response.json().then((Posts) => {
@@ -37,6 +38,7 @@ export default function Room() {
       });
     });
   }, [id]);
+  
   const users = useUserStore((state) => state.profile);
   const setProfile = useUserStore((state) => state.setProfile);
   useEffect(() => {
@@ -53,9 +55,10 @@ export default function Room() {
         console.log("Error fetching user profile:", error);
       }
     };
-
+    
     fetchUserProfile();
   }, [setProfile]);
+  
   const {
     title,
     uploadedImageIds,
@@ -66,6 +69,7 @@ export default function Room() {
     nightlyPrice,
     monthlyPrice,
   } = post;
+
   const PRICE_PER_NIGHT =
     propertyCategory === "touristes" ? nightlyPrice : null;
   const PRICE_PER_MONTH =
@@ -150,7 +154,7 @@ export default function Room() {
               className="relative overflow-hidden rounded-lg"
               prefetch={false}
             >
-              <img
+              <Image
                 src={uploadedImageIds?.[0]}
                 alt="Chambre d'hôtel"
                 width={600}
@@ -166,7 +170,7 @@ export default function Room() {
                   className="relative overflow-hidden rounded-lg"
                   prefetch={false}
                 >
-                  <img
+                  <Image
                     src={image}
                     alt="Chambre d'hôtel"
                     width={300}

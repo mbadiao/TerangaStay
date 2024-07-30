@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import useUserStore from "@/store/userStore";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 export default function Profil() {
   const [checkouts, setcheckout] = useState([]);
@@ -100,7 +99,7 @@ export default function Profil() {
         <div className="grid gap-4 mt-4">
           {checkouts.length > 0 ? (
             checkouts.map((checkout) => (
-              <Card className="py-4">
+              <Card key={checkout?._id} className="py-4">
                 <CardContent className="grid grid-cols-[1fr_auto] gap-4">
                   <div>
                     <h4 className="font-medium">
@@ -166,7 +165,7 @@ export default function Profil() {
             <div>
               <div className="font-medium">Sécurité du compte</div>
               <div className="text-sm text-muted-foreground">
-                Changer le mot de passe, activer l'authentification à deux
+                Changer le mot de passe, activer l&apos;authentification à deux
                 facteurs
               </div>
             </div>
