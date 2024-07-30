@@ -10,7 +10,7 @@ const router = require("./routes/routes");
 config();
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.HOST,
   credentials: true,
 }));
 app.use(cookieParser());
