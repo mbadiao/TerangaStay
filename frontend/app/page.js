@@ -3,13 +3,23 @@ import { useState, useEffect } from "react";
 import { Hero } from "@/components/Hero";
 import { ThreeDCard } from "@/components/card";
 import useUserStore from "@/store/userStore";
+import { SelectValue, Select, SelectTrigger, SelectItem, SelectContent } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 export default function Home() {
-  const [allposts, setPosts] = useState([]);
+  const [allPosts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const [searchTitle, setSearchTitle] = useState("");
+  const [filterType, setFilterType] = useState("all");
+
   const setProfile = useUserStore((state) => state.setProfile);
+
   useEffect(() => {
     fetch(process.env.NEXT_PUBLIC_BASE + "properties")
       .then((response) => response.json())
-      .then((Posts) => setPosts(Posts));
+      .then((posts) => {
+        setPosts(posts);
+        setFilteredPosts(posts);
+      });
 
     const fetchUserProfile = async () => {
       try {
@@ -18,8 +28,8 @@ export default function Home() {
         });
         if (response.ok) {
           const data = await response.json();
-          if (data._id){
-            localStorage.setItem('user', data._id)
+          if (data._id) {
+            localStorage.setItem("user", data._id);
           }
           setProfile(data);
         }
@@ -30,15 +40,57 @@ export default function Home() {
 
     fetchUserProfile();
   }, [setProfile]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [searchTitle, filterType, allPosts]);
+
+  const applyFilters = () => {
+    let filtered = allPosts;
+
+    if (searchTitle) {
+      filtered = filtered.filter((post) =>
+        post.title.toLowerCase().includes(searchTitle.toLowerCase())
+      );
+    }
+
+    if (filterType !== "all") {
+      filtered = filtered.filter(
+        (post) => post.propertyCategory === filterType
+      );
+    }
+
+    setFilteredPosts(filtered);
+  };
+
   return (
     <main>
       <Hero />
-      <div className="flex flex-wrap justify-center item-center">
-      {allposts.length > 0 ? (
-        allposts.map((post) => <ThreeDCard key={post._id} {...post} />)
-      ) : (
-        <div>no post yet</div>
-      )}
+      <div className="flex justify-center h-max flex-wrap items-center  gap-3  mb-4">
+        <Input
+          type="text"
+          placeholder="Rechercher par titre"
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
+          className="w-1/2"
+        />
+        <Select onValueChange={setFilterType}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Tous les types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les types</SelectItem>
+            <SelectItem value="etudiants">Étudiants</SelectItem>
+            <SelectItem value="touristes">Touristes</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex flex-wrap justify-center items-center">
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => <ThreeDCard key={post._id} {...post} />)
+        ) : (
+          <div>Aucun post trouvé</div>
+        )}
       </div>
     </main>
   );

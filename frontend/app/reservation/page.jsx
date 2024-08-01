@@ -48,7 +48,7 @@ export default function Reservation() {
   });
 
   return (
-    <div className="container mx-auto py-8 h-screen">
+    <div className="container mx-auto py-8 min-h-screen h-max">
       <h1 className="text-3xl font-bold mb-6 flex items-center">
         <CalendarIcon className="mr-2 h-6 w-6" />
         Réservations d&apos;Hôtel
@@ -88,7 +88,7 @@ export default function Reservation() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto min-h-screen h-max">
         <table className="w-full table-auto border-collapse">
           <thead>
             <tr className="bg-gray-200">
