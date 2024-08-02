@@ -40,7 +40,7 @@ export function Navbar() {
       localStorage.removeItem("user");
 
       const response = await fetch(process.env.NEXT_PUBLIC_BASE + "logout", {
-        method:'POST',
+        method: "POST",
         credentials: "include",
       });
       if (response.ok) {
@@ -50,7 +50,7 @@ export function Navbar() {
       console.log("Error fetching user profile:", error);
     }
     setProfile(null);
-    router.push('/');
+    router.push("/");
   };
 
   return (
@@ -92,7 +92,7 @@ export function Navbar() {
               <DropdownMenuContent align="end">
                 {user?.email ? (
                   <>
-                    <DropdownMenuItem className='flex flex-col justify-start items-start '>
+                    <DropdownMenuItem className="flex flex-col justify-start items-start ">
                       <Link
                         href="/profil"
                         className="flex items-center gap-2 my-2"
@@ -101,14 +101,16 @@ export function Navbar() {
                         <UserIcon className="w-4 h-4" />
                         <span>Profil</span>
                       </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="flex flex-col justify-start items-start ">
                       <Link
-                          href="/dashboard"
-                          className="flex items-center gap-2 my-2"
-                          prefetch={false}
-                        >
-                          <SettingsIcon className="w-4 h-4" />
-                          <span>Dashboard</span>
-                        </Link>
+                        href="/dashboard"
+                        className="flex items-center gap-2 my-2"
+                        prefetch={false}
+                      >
+                        <SettingsIcon className="w-4 h-4" />
+                        <span>Dashboard</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem>
@@ -188,6 +190,8 @@ export function Navbar() {
                           <UserIcon className="w-4 h-4" />
                           <span>Profil</span>
                         </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
                         <Link
                           href="/dashboard"
                           className="flex items-center gap-2"
