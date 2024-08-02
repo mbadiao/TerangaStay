@@ -61,7 +61,7 @@ export default function Home() {
       );
     }
 
-    setFilteredPosts(filtered.reverse());
+    setFilteredPosts(filtered);
   };
 
   return (
