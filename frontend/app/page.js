@@ -5,6 +5,7 @@ import { ThreeDCard } from "@/components/card";
 import useUserStore from "@/store/userStore";
 import { SelectValue, Select, SelectTrigger, SelectItem, SelectContent } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+
 export default function Home() {
   const [allPosts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
@@ -60,7 +61,7 @@ export default function Home() {
       );
     }
 
-    setFilteredPosts(filtered);
+    setFilteredPosts(filtered.reverse());
   };
 
   return (
