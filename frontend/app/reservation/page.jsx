@@ -116,7 +116,7 @@ export default function Reservation() {
             </tr>
           </thead>
           <tbody>
-            {filteredReservations.map((reservation) => (
+            {filteredReservations?.map((reservation) => (
               <tr className="border-b" key={reservation._id}>
                 <td className="px-4 py-2 flex items-center">
                   <PackageIcon className="mr-2 h-4 w-4" />
