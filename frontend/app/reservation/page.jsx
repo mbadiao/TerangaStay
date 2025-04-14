@@ -39,7 +39,7 @@ export default function Reservation() {
     fetchUserReservations();
   }, [toast]);
 
-  const filteredReservations = reservations.filter((reservation) => {
+  const filteredReservations = reservations?.filter((reservation) => {
     return (
       (propertyTypeFilter === "all" ||
         reservation.propriete.propertyType === propertyTypeFilter) &&
