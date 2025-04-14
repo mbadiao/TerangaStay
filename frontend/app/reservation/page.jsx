@@ -14,6 +14,10 @@ export default function Reservation() {
   useEffect(() => {
     const fetchUserReservations = async () => {
       const userid = localStorage.getItem("user");
+      if (!userid) {
+        toast({ description: "Utilisateur non connecté." });
+        return;
+      }
       try {
         const response = await fetch(
           process.env.NEXT_PUBLIC_BASE + `reservation/user/${userid}`,
@@ -42,8 +46,8 @@ export default function Reservation() {
   const filteredReservations = reservations?.filter((reservation) => {
     return (
       (propertyTypeFilter === "all" ||
-        reservation.propriete.propertyType === propertyTypeFilter) &&
-      (statusFilter === "all" || reservation.statut === statusFilter)
+        reservation.propriete?.propertyType === propertyTypeFilter) &&
+      (statusFilter === "all" || reservation?.statut === statusFilter)
     );
   });
 
@@ -93,16 +97,22 @@ export default function Reservation() {
           <thead>
             <tr className="bg-gray-200">
               <th className="px-4 py-2 text-left flex items-center">
+                <div className="flex items-center">
                 <PackageIcon className="mr-2 h-4 w-4" />
                 Type
+                </div>
               </th>
               <th className="px-4 py-2 text-left">
+               <div className="flex items-center">
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 Arrivée
+                </div>
               </th>
               <th className="px-4 py-2 text-left">
+              <div className="flex items-center"> 
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 Départ
+                </div>
               </th>
               <th className="px-4 py-2 text-left">XOF Prix Total</th>
               <th className="px-4 py-2 text-left">
@@ -124,11 +134,11 @@ export default function Reservation() {
                 </td>
                 <td className="px-4 py-2">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {new Date(reservation.dateDeDebut).toLocaleDateString()}
+                  {new Date(reservation?.dateDeDebut).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-2">
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {new Date(reservation.dateDeFin).toLocaleDateString()}
+                  {new Date(reservation?.dateDeFin).toLocaleDateString()}
                 </td>
                 {reservation?.propriete.propertyType === "appartement" ? (
                   <td className="px-4 py-2">
@@ -140,25 +150,25 @@ export default function Reservation() {
                 <td className="px-4 py-2">
                   <span
                     className={`flex items-center justify-center px-2 py-1 rounded-full ${
-                      reservation.statut === "confirmee"
+                      reservation?.statut === "confirmee"
                         ? "bg-green-200 text-green-800"
-                        : reservation.statut === "en attente"
+                        : reservation?.statut === "en attente"
                         ? "bg-yellow-200 text-yellow-800"
                         : "bg-red-200 text-red-800"
                     }`}
                   >
-                    {reservation.statut === "confirmee" && (
+                    {reservation?.statut === "confirmee" && (
                       <CircleCheckIcon className="mr-2 h-4 w-4" />
                     )}
-                    {reservation.statut === "en attente" && (
+                    {reservation?.statut === "en attente" && (
                       <CircleAlertIcon className="mr-2 h-4 w-4" />
                     )}
-                    {reservation.statut}
+                    {reservation?.statut}
                   </span>
                 </td>
                 <td className="px-4 py-2">
                   <div className="flex gap-2">
-                    <Link href={`/checkout/${reservation._id}`}>
+                    <Link href={`/checkout/${reservation?._id}`}>
                       <Button variant="outline" size="sm">
                         <FilePenIcon className="mr-2 h-4 w-4" />
                         Paiement
