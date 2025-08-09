@@ -24,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 // import AddressAutocomplete from "@/components/AddressAutocomplete";
 import Image from "next/image";
+import { LoadingPage } from "@/components/ui/loading-spinner";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   AiOutlineHome,
   AiOutlineUser,
@@ -38,12 +40,15 @@ import {
   MdOutlineLocationOn,
   MdOutlineImage,
 } from "react-icons/md";
-import ImageUploading from "react-images-uploading";
+
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import useUserStore from "@/store/userStore";
 import dynamic from "next/dynamic";
-const AddressAutocomplete = dynamic(() => import('@/components/AddressAutocomplete'), { ssr: false });
+const AddressAutocomplete = dynamic(
+  () => import("@/components/AddressAutocomplete"),
+  { ssr: false },
+);
 export default function Hote() {
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -109,7 +114,7 @@ export default function Hote() {
         const response = await storageClient.createFile(
           process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID,
           SDK.ID.unique(),
-          image.file
+          image.file,
         );
         const imageUrl = `${process.env.NEXT_PUBLIC_APPWRITE_IMAGE_ENDPOINT}${process.env.NEXT_PUBLIC_APPWRITE_BUCKET_ID}/files/${response.$id}/view?project=${process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID}`;
         uploadedImageIds.push(imageUrl);
@@ -190,11 +195,7 @@ export default function Hote() {
   return (
     <>
       {loading && (
-        <div className="z-10 bg-black opacity-50 absolute w-full min-h-screen">
-          <div className="text-xl text-white grid place-items-center   min-h-screen">
-            <Image src="/Animation.gif" alt="Animation" className="mr-2  w-40" />
-          </div>
-        </div>
+        <LoadingPage title="Création de votre propriété en cours..." />
       )}
       <Card className="max-w-4xl mx-auto border-none shadow-none p-6 sm:p-8 md:p-10 min-h-screen">
         <CardHeader>
@@ -493,68 +494,23 @@ export default function Hote() {
                   <MdOutlineImage className="mr-2 h-5 w-5" />
                   Téléchargez des Photos
                 </Label>
-                <ImageUploading
-                  multiple
-                  value={images}
-                  onChange={(imageList) => setImages(imageList)}
-                  maxNumber={5}
-                  dataURLKey="data_url"
-                >
-                  {({
-                    imageList,
-                    onImageUpload,
-                    onImageRemoveAll,
-                    onImageUpdate,
-                    onImageRemove,
-                  }) => (
-                    <div className="upload__image-wrapper">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onImageUpload();
-                        }}
-                        className="border p-2 rounded mb-2"
-                      >
-                        Téléchargez des images
-                      </button>
-                      &nbsp;
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          onImageRemoveAll();
-                        }}
-                        className="border p-2 rounded mb-2"
-                      >
-                        Supprimer toutes les images
-                      </button>
-                      {imageList.map((image, index) => (
-                        <div key={index} className="image-item flex">
-                          <Image src={image.data_url} alt="" width="100" />
-                          <div className="image-item__btn-wrapper ">
-                            <Button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                onImageUpdate(index);
-                              }}
-                              className="border p-2 rounded mb-2"
-                            >
-                              Mettre à jour
-                            </Button>
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                onImageRemove(index);
-                              }}
-                              className="border p-2 rounded mb-2"
-                            >
-                              Supprimer
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </ImageUploading>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="images" className="text-lg font-semibold">
+                      Images de la Propriété
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Ajoutez jusqu'à 5 images de haute qualité de votre
+                      propriété
+                    </p>
+                  </div>
+                  <ImageUpload
+                    value={images}
+                    onChange={setImages}
+                    maxNumber={5}
+                    className="w-full"
+                  />
+                </div>
               </div>
             )}
 

@@ -23,7 +23,7 @@ export default function Reservation() {
           process.env.NEXT_PUBLIC_BASE + `reservation/user/${userid}`,
           {
             credentials: "include",
-          }
+          },
         );
         if (response.ok) {
           const data = await response.json();
@@ -46,141 +46,203 @@ export default function Reservation() {
   const filteredReservations = reservations?.filter((reservation) => {
     return (
       (propertyTypeFilter === "all" ||
-        reservation.propriete?.propertyType === propertyTypeFilter) &&
+        reservation?.propriete?.propertyType === propertyTypeFilter) &&
       (statusFilter === "all" || reservation?.statut === statusFilter)
     );
   });
 
   return (
-    <div className="container mx-auto py-8 min-h-screen h-max">
-      <h1 className="text-3xl font-bold mb-6 flex items-center">
-        <CalendarIcon className="mr-2 h-6 w-6" />
-        Réservations d&apos;Hôtel
-      </h1>
+    <div className="container mx-auto py-8 px-4 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2 flex items-center text-gray-900">
+          <CalendarIcon className="mr-3 h-8 w-8 text-primary" />
+          Mes Réservations
+        </h1>
+        <p className="text-gray-600">
+          Gérez vos réservations d&apos;hébergements
+        </p>
+      </div>
 
-      <div className="mb-6 flex space-x-4">
-        <div>
-          <label htmlFor="propertyTypeFilter" className="block mb-2">
-            Filtrer par type de propriété
-          </label>
-          <select
-            id="propertyTypeFilter"
-            value={propertyTypeFilter}
-            onChange={(e) => setPropertyTypeFilter(e.target.value)}
-            className="border bg-primary text-white border-primary rounded-md p-2"
-          >
-            <option value="all">Tous</option>
-            <option value="appartement">Appartement</option>
-            <option value="hotel">Hôtel</option>
-          </select>
-        </div>
+      <div className="bg-white p-6 rounded-lg shadow-sm border mb-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Filtres</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label
+              htmlFor="propertyTypeFilter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Type de propriété
+            </label>
+            <select
+              id="propertyTypeFilter"
+              value={propertyTypeFilter}
+              onChange={(e) => setPropertyTypeFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="all">Tous les types</option>
+              <option value="appartement">Appartement</option>
+              <option value="hotel">Hôtel</option>
+            </select>
+          </div>
 
-        <div>
-          <label htmlFor="statusFilter" className="block mb-2">
-            Filtrer par statut
-          </label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border bg-primary text-white border-gray-300 rounded-md p-2"
-          >
-            <option value="all">Tous</option>
-            <option value="en attente">En attente</option>
-            <option value="confirmee">Confirmée</option>
-          </select>
+          <div>
+            <label
+              htmlFor="statusFilter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Statut de la réservation
+            </label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="en attente">En attente</option>
+              <option value="confirmee">Confirmée</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto min-h-screen h-max">
-        <table className="w-full table-auto border-collapse">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="px-4 py-2 text-left flex items-center">
-                <div className="flex items-center">
-                <PackageIcon className="mr-2 h-4 w-4" />
-                Type
-                </div>
-              </th>
-              <th className="px-4 py-2 text-left">
-               <div className="flex items-center">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                Arrivée
-                </div>
-              </th>
-              <th className="px-4 py-2 text-left">
-              <div className="flex items-center"> 
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                Départ
-                </div>
-              </th>
-              <th className="px-4 py-2 text-left">XOF Prix Total</th>
-              <th className="px-4 py-2 text-left">
-                <CircleCheckIcon className="mr-2 h-4 w-4" />
-                Statut
-              </th>
-              <th className="px-4 py-2 text-left">
-                <FilePenIcon className="mr-2 h-4 w-4" />
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredReservations?.map((reservation) => (
-              <tr className="border-b" key={reservation._id}>
-                <td className="px-4 py-2 flex items-center">
-                  <PackageIcon className="mr-2 h-4 w-4" />
-                  {reservation.propriete.propertyType}
-                </td>
-                <td className="px-4 py-2">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {new Date(reservation?.dateDeDebut).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-2">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {new Date(reservation?.dateDeFin).toLocaleDateString()}
-                </td>
-                {reservation?.propriete.propertyType === "appartement" ? (
-                  <td className="px-4 py-2">
-                    {reservation?.montantMensuelTotal} XOF
-                  </td>
-                ) : (
-                  <td className="px-4 py-2">{reservation?.montantTotal} XOF</td>
-                )}
-                <td className="px-4 py-2">
-                  <span
-                    className={`flex items-center justify-center px-2 py-1 rounded-full ${
-                      reservation?.statut === "confirmee"
-                        ? "bg-green-200 text-green-800"
-                        : reservation?.statut === "en attente"
-                        ? "bg-yellow-200 text-yellow-800"
-                        : "bg-red-200 text-red-800"
-                    }`}
+      {filteredReservations?.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
+          <CalendarIcon className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Aucune réservation trouvée
+          </h3>
+          <p className="text-gray-600 mb-6">
+            {reservations?.length === 0
+              ? "Vous n'avez pas encore effectué de réservation."
+              : "Aucune réservation ne correspond à vos critères de filtre."}
+          </p>
+          <Link href="/">
+            <Button className="bg-primary hover:bg-primary/90">
+              Découvrir nos hébergements
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    <div className="flex items-center">
+                      <PackageIcon className="mr-2 h-5 w-5 text-gray-500" />
+                      Type
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    <div className="flex items-center">
+                      <CalendarIcon className="mr-2 h-5 w-5 text-gray-500" />
+                      Arrivée
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    <div className="flex items-center">
+                      <CalendarIcon className="mr-2 h-5 w-5 text-gray-500" />
+                      Départ
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    Prix Total
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    <div className="flex items-center">
+                      <CircleCheckIcon className="mr-2 h-5 w-5 text-gray-500" />
+                      Statut
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                    <div className="flex items-center">
+                      <FilePenIcon className="mr-2 h-5 w-5 text-gray-500" />
+                      Actions
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredReservations?.map((reservation) => (
+                  <tr
+                    key={reservation._id}
+                    className="hover:bg-gray-50 transition-colors"
                   >
-                    {reservation?.statut === "confirmee" && (
-                      <CircleCheckIcon className="mr-2 h-4 w-4" />
-                    )}
-                    {reservation?.statut === "en attente" && (
-                      <CircleAlertIcon className="mr-2 h-4 w-4" />
-                    )}
-                    {reservation?.statut}
-                  </span>
-                </td>
-                <td className="px-4 py-2">
-                  <div className="flex gap-2">
-                    <Link href={`/checkout/${reservation?._id}`}>
-                      <Button variant="outline" size="sm">
-                        <FilePenIcon className="mr-2 h-4 w-4" />
-                        Paiement
-                      </Button>
-                    </Link>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <PackageIcon className="mr-3 h-5 w-5 text-gray-400" />
+                        <span className="text-sm font-medium text-gray-900">
+                          {reservation?.propriete?.propertyType || "N/A"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(reservation?.dateDeDebut).toLocaleDateString(
+                        "fr-FR",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {new Date(reservation?.dateDeFin).toLocaleDateString(
+                        "fr-FR",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        },
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {reservation?.propriete?.propertyType === "appartement"
+                          ? `${reservation?.montantMensuelTotal || "0"} XOF`
+                          : `${reservation?.montantTotal || "0"} XOF`}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          reservation?.statut === "confirmee"
+                            ? "bg-green-100 text-green-800"
+                            : reservation?.statut === "en attente"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {reservation?.statut === "confirmee" && (
+                          <CircleCheckIcon className="mr-1 h-3 w-3" />
+                        )}
+                        {reservation?.statut === "en attente" && (
+                          <CircleAlertIcon className="mr-1 h-3 w-3" />
+                        )}
+                        {reservation?.statut}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link href={`/checkout/${reservation?._id}`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="hover:bg-primary hover:text-white transition-colors"
+                        >
+                          <FilePenIcon className="mr-2 h-4 w-4" />
+                          Paiement
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -330,8 +392,6 @@ function PackageIcon(props) {
     </svg>
   );
 }
-
-
 
 function XIcon(props) {
   return (
